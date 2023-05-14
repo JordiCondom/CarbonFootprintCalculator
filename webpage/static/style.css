@@ -1,0 +1,56 @@
+/* Center everything */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  /* Style the headings */
+  h1 {
+    font-size: 2rem;
+    margin: 1rem;
+  }
+  
+  /* Style the form labels and inputs */
+  label {
+    font-size: 1.2rem;
+    margin: 0.5rem;
+  }
+  
+  input[type="text"],
+  input[type="password"],
+  input[type="radio"] {
+    font-size: 1.2rem;
+    margin: 0.5rem;
+  }
+  
+  /* Style the buttons */
+  input[type="submit"],
+  a.button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 1rem;
+    font-size: 1.2rem;
+    color: white;
+    background-color: green;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  input[type="submit"]:hover,
+  a.button:hover {
+    background-color: darkgreen;
+  }
+  
+  /* Style the images */
+  img {
+    max-width: 100%;
+    height: auto;
+    margin: 1rem;
+  }
+  

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Input Data</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+  </head>
+  <body>
+  <div>
+    <h1>Input Data</h1>
+    <form action="/input" method="POST">
+      <p>Question 1: How many kebabs did you eat today?</p>
+      <label><input type="radio" name="question1" value="1"> 1</label><br>
+      <label><input type="radio" name="question1" value="2"> 2</label><br>
+      <label><input type="radio" name="question1" value="3"> 3</label><br><br>
+      <p>Question 2: How many kebabs did you eat yesterday?</p>
+      <label><input type="radio" name="question2" value="1"> 1</label><br>
+      <label><input type="radio" name="question2" value="2"> 2</label><br>
+      <label><input type="radio" name="question2" value="3"> 3</label><br><br>
+      <p>Question 2: How many kebabs did you eat the day before yesterday?</p>
+      <label><input type="radio" name="question3" value="1"> 1</label><br>
+      <label><input type="radio" name="question3" value="2"> 2</label><br>
+      <label><input type="radio" name="question3" value="3"> 3</label><br><br>
+      <input type="submit" value="Submit">
+      <a href="/dashboard" class="button">Back to Dashboard</a>
+    </form>
+  </div>
+  </body>
+</html>
