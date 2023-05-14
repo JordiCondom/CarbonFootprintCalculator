@@ -44,6 +44,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None  # Initialize error message to None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -51,23 +52,25 @@ def login():
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
         else:
-            return "Invalid login credentials. Please try again."
-    return render_template('login.html')
+            error = "Invalid login credentials. Please try again."  # Set error message
+    return render_template('login.html', error=error)  # Pass error message to the template
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    error = None  # Initialize error message to None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         if username in users:
-            return "Username already exists. Please choose a different one."
-        # Update the user data in the JSON file
-        users[username] = password
-        with open('users.json', 'w') as f:
-            json.dump(users, f)
-        session['username'] = username  # Store the username in a session variable
-        return redirect('/dashboard')
-    return render_template('registration.html')
+            error = "Username already exists. Please choose a different one."  # Set error message
+        else:
+            # Update the user data in the JSON file
+            users[username] = password
+            with open('users.json', 'w') as f:
+                json.dump(users, f)
+            session['username'] = username  # Store the username in a session variable
+            return redirect('/dashboard')
+    return render_template('registration.html', error=error)  # Pass error message to the template
 
 @app.route('/dashboard')
 def dashboard():

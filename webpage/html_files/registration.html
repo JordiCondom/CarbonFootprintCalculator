@@ -5,13 +5,19 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
   <body>
+    <div>
     <h1>Registration Page</h1>
     <form action="/register" method="post">
       <label for="username">Username:</label>
       <input type="text" id="username" name="username"><br><br>
       <label for="password">Password:</label>
       <input type="password" id="password" name="password"><br><br>
+      {% if error %}
+      <p style="color: red">{{ error }}</p>
+      {% endif %}
       <input type="submit" value="Register">
+      <a href="/login" class="button">Back to Login</a>
     </form>
+  </div>
   </body>
 </html>
