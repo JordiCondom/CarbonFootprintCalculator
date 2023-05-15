@@ -1,15 +1,28 @@
 /* Center everything */
 body {
+    /* background: linear-gradient(to bottom right, #8BC34A, #4CAF50);*/
+    background: url('./backgroundimage.jpeg') no-repeat center center fixed;
+    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    margin: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 20px;
   }
   
   /* Style the headings */
   h1 {
     font-size: 2rem;
     margin: 1rem;
+    color: green;
   }
   
   /* Style the form labels and inputs */
@@ -33,7 +46,7 @@ body {
     margin: 1rem;
     font-size: 1.2rem;
     color: white;
-    background-color: green;
+    background: linear-gradient(to bottom right, #8BC34A, #4CAF50);
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
