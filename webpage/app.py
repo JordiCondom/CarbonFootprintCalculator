@@ -93,13 +93,14 @@ def input_data():
         answer1 = request.form['question1']
         answer2 = request.form['question2']
         answer3 = request.form['question3']
+        answer4 = request.form['question4']
         now = datetime.now()
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
         with open('answers.csv', mode='a', newline='') as file:
             writer = csv.writer(file)
             if os.stat('answers.csv').st_size == 0: # write header if file is empty
-                writer.writerow(['username', 'datetime', 'question1', 'question2', 'question3'])
-            writer.writerow([session['username'], current_time, answer1, answer2, answer3])
+                writer.writerow(['username', 'datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
+            writer.writerow([session['username'], current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)])
         return redirect('/track')
     
     return render_template('input.html')
@@ -114,40 +115,61 @@ def track_data():
 
     # Create a dictionary to store the data for each date
     dates = sorted(list(set(user_data['datetime'])))
-    date_data = {date: {'q1': [], 'q2': [], 'q3': []} for date in dates}
+    date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
 
     # Extract the data for each date
     for _, row in user_data.iterrows():
         date = row['datetime']
-        date_data[date]['q1'].append(row['question1'])
-        date_data[date]['q2'].append(row['question2'])
-        date_data[date]['q3'].append(row['question3'])
+        date_data[date]['food'].append(row['food'])
+        date_data[date]['transportation'].append(row['transportation'])
+        date_data[date]['household'].append(row['household'])
+        date_data[date]['expenses'].append(row['expenses'])
+        date_data[date]['total'].append(row['total'])
 
     # Generate the figure **without using pyplot**.
-    fig = Figure()
-    ax = fig.subplots()
+    fig = Figure(figsize=(10, 10))
+    gs = fig.add_gridspec(2, 2)
+    ax1 = fig.add_subplot(gs[0, :])
+    ax2 = fig.add_subplot(gs[1, 0])
+    ax3 = fig.add_subplot(gs[1, 1])
 
     # Plot the data for each date and connect the points
     for date in dates:
-        x = ['Q1', 'Q2', 'Q3']
-        y = [np.mean(date_data[date]['q1']),
-             np.mean(date_data[date]['q2']),
-             np.mean(date_data[date]['q3'])]
-        ax.plot(x, y, label=date, marker='o')
-        ax.plot(x, y, 'k--', alpha=0.5)
+        x = ['food', 'transportation', 'household', 'expenses']
+        y = [np.mean(date_data[date]['food']),
+             np.mean(date_data[date]['transportation']),
+             np.mean(date_data[date]['household']),
+             np.mean(date_data[date]['expenses'])]
+        ax1.plot(x, y, label=date, marker='o')
+        ax1.plot(x, y, 'k--', alpha=0.5)
 
-    ax.set_xlabel('Question')
-    ax.set_ylabel('Answer')
-    ax.legend()
+    ax1.set_xlabel('Question')
+    ax1.set_ylabel('Answer')
+    ax1.legend()
 
-    # Save the figure to a temporary buffer.
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
+    # Create a pie chart for the expense categories
+    expense_labels = ['Food', 'Transportation', 'Household', 'Expenses']
+    expense_values = [
+        np.sum(user_data['food']),
+        np.sum(user_data['transportation']),
+        np.sum(user_data['household']),
+        np.sum(user_data['expenses'])
+    ]
+    ax2.pie(expense_values, labels=expense_labels, autopct='%1.1f%%')
+    ax2.set_aspect('equal')  # Equal aspect ratio ensures the pie is circular
 
-    # Embed the result in the html output.
-    data = base64.b64encode(buf.getvalue()).decode()
-    return render_template('track.html', plot_url=f'data:image/png;base64,{data}')
+    ax3.plot(user_data['datetime'], user_data['total'])
+    ax3.set_xlabel('Datetime')
+    ax3.set_ylabel('Total')
+
+    # Save the figures to a temporary buffer.
+    buf1 = io.BytesIO()
+    fig.savefig(buf1, format='png')
+    buf1.seek(0)
+
+    # Embed the results in the HTML output.
+    data1 = base64.b64encode(buf1.getvalue()).decode()
+    return render_template('track.html', plot_url1=f'data:image/png;base64,{data1}')
 
 # Recommendations page
 @app.route('/recommend')
