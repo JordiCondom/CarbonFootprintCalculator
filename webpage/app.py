@@ -1,5 +1,4 @@
 import base64
-from collections import defaultdict
 import io
 import json
 import os
@@ -17,8 +16,9 @@ if os.path.exists(session_cookie_path):
     os.remove('flask_session')
 
 app = Flask(__name__, template_folder='./html_files')
-# Set the location of the session cookie file to a temporary directory
 
+
+# Set the location of the session cookie file to a temporary directory
 app.config['SESSION_FILE_DIR'] = './'
 app.config['SESSION_FILE_THRESHOLD'] = 0
 app.config['SESSION_COOKIE_NAME'] = 'session'
@@ -33,6 +33,7 @@ app.config['SECRET_KEY'] = os.urandom(24)
 with open('users.json') as f:
     users = json.load(f)
 
+# Main page: if user connected you go to dashboard, otherwise go to login
 @app.route('/')
 def index():
     if 'username' in session:
@@ -42,28 +43,32 @@ def index():
         session.pop('username', None)
         return redirect('/login')
 
+
+# Login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None  # Initialize error message to None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username in users and users[username] == password:
+        if username in users and users[username] == password: # Check username and password are correct
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
         else:
-            error = "Invalid login credentials. Please try again."  # Set error message
+            error = "Invalid login credentials. Please try again."  # Set error message, which will appear in the html
     return render_template('login.html', error=error)  # Pass error message to the template
 
+
+# Register page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     error = None  # Initialize error message to None
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username in users:
+        if username in users: # Username exists -> error
             error = "Username already exists. Please choose a different one."  # Set error message
-        else:
+        else: # Create username 
             # Update the user data in the JSON file
             users[username] = password
             with open('users.json', 'w') as f:
@@ -72,6 +77,7 @@ def register():
             return redirect('/dashboard')
     return render_template('registration.html', error=error)  # Pass error message to the template
 
+# Page with to access the input, track and recommendations pages
 @app.route('/dashboard')
 def dashboard():
     if 'username' in session:
@@ -79,6 +85,8 @@ def dashboard():
     else:
         return redirect('/login')
     
+
+# Questionnaire/Survey page
 @app.route('/input', methods=['GET', 'POST'])
 def input_data():
     if request.method == 'POST':
@@ -92,9 +100,11 @@ def input_data():
             if os.stat('answers.csv').st_size == 0: # write header if file is empty
                 writer.writerow(['username', 'datetime', 'question1', 'question2', 'question3'])
             writer.writerow([session['username'], current_time, answer1, answer2, answer3])
-        return redirect('/dashboard')
+        return redirect('/track')
     
     return render_template('input.html')
+
+# Tracking data page, with the graphs and any required tracking data tool
 @app.route('/track')
 def track_data():
     # Get the data for the current user from the answers.csv file
@@ -139,6 +149,7 @@ def track_data():
     data = base64.b64encode(buf.getvalue()).decode()
     return render_template('track.html', plot_url=f'data:image/png;base64,{data}')
 
+# Recommendations page
 @app.route('/recommend')
 def recommend_data():
     return render_template('recommend.html')
