@@ -1,7 +1,6 @@
 import base64
 import io
 import os
-import csv
 from datetime import datetime
 from flask import Flask, redirect, render_template, request, session, make_response
 from matplotlib.figure import Figure
@@ -77,8 +76,6 @@ def register():
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
     return render_template('registration.html', error=error)  # Pass error message to the template
-
-
 
 # Page with to access the input, track and recommendations pages
 @app.route('/dashboard')
@@ -157,15 +154,44 @@ def input_data():
 def track_data():
     # Get the data for the current user from the answers.csv file
     username = session['username']
-    data = pd.read_csv('answers.csv')
-    user_data = data[data['username'] == username]
+
+    conn = psycopg2.connect(
+            host='localhost',
+            port=5858,
+            user='postgres',
+            password='password',
+            database='mydatabase'
+        )
+    
+    # Retrieve the username from the Flask session
+    username = session['username']
+        
+    # Create a table name based on the username
+    table_name = f'user_{username}' 
+
+    with conn.cursor() as cursor:
+        # Select all rows from the table for the given username
+        select_query = sql.SQL("""
+            SELECT * FROM {table_name}
+        """).format(table_name=sql.Identifier(table_name))
+        cursor.execute(select_query)
+
+        # Fetch all the results
+        user_data = cursor.fetchall()
+
+        # Close the cursor and connection
+        cursor.close()
+        conn.close()
+
+    df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
+
 
     # Create a dictionary to store the data for each date
-    dates = sorted(list(set(user_data['datetime'])))
+    dates = sorted(list(set(df['datetime'])))
     date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
 
     # Extract the data for each date
-    for _, row in user_data.iterrows():
+    for _, row in df.iterrows():
         date = row['datetime']
         date_data[date]['food'].append(row['food'])
         date_data[date]['transportation'].append(row['transportation'])
@@ -197,15 +223,15 @@ def track_data():
     # Create a pie chart for the expense categories
     expense_labels = ['Food', 'Transportation', 'Household', 'Expenses']
     expense_values = [
-        np.sum(user_data['food']),
-        np.sum(user_data['transportation']),
-        np.sum(user_data['household']),
-        np.sum(user_data['expenses'])
+        np.sum(df['food']),
+        np.sum(df['transportation']),
+        np.sum(df['household']),
+        np.sum(df['expenses'])
     ]
     ax2.pie(expense_values, labels=expense_labels, autopct='%1.1f%%')
     ax2.set_aspect('equal')  # Equal aspect ratio ensures the pie is circular
 
-    ax3.plot(user_data['datetime'], user_data['total'])
+    ax3.plot(df['datetime'], df['total'])
     ax3.set_xlabel('Datetime')
     ax3.set_ylabel('Total')
 
