@@ -1,0 +1,8 @@
+Flask
+pymongo
+psycopg2
+matplotlib
+numpy
+pandas
+psycopg2-binary
+psycopg2

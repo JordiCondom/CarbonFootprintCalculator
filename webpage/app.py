@@ -1,6 +1,5 @@
 import base64
 import io
-import json
 import os
 import csv
 from datetime import datetime
@@ -8,15 +7,15 @@ from flask import Flask, redirect, render_template, request, session, make_respo
 from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
-
-# Delete the session cookie file if it exists
+from classes.mongodbmanager import MongoDBManager
+import psycopg2
+from psycopg2 import sql
 
 session_cookie_path = './session_cookie'
 if os.path.exists(session_cookie_path):
     os.remove('flask_session')
 
 app = Flask(__name__, template_folder='./html_files')
-
 
 # Set the location of the session cookie file to a temporary directory
 app.config['SESSION_FILE_DIR'] = './'
@@ -28,11 +27,6 @@ app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SECRET_KEY'] = os.urandom(24)
 
-
-# Load the user data from the JSON file
-with open('users.json') as f:
-    users = json.load(f)
-
 # Main page: if user connected you go to dashboard, otherwise go to login
 @app.route('/')
 def index():
@@ -43,7 +37,6 @@ def index():
         session.pop('username', None)
         return redirect('/login')
 
-
 # Login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -51,13 +44,13 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username in users and users[username] == password: # Check username and password are correct
+        mongo_manager = MongoDBManager('CarbonFootprintCalculator', 'Users')
+        if mongo_manager.check_login(username, password):
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
         else:
             error = "Invalid login credentials. Please try again."  # Set error message, which will appear in the html
     return render_template('login.html', error=error)  # Pass error message to the template
-
 
 # Register page
 @app.route('/register', methods=['GET', 'POST'])
@@ -66,16 +59,27 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username in users: # Username exists -> error
+        repeat_password = request.form['repeat_password']
+        mongo_manager = MongoDBManager('CarbonFootprintCalculator', 'Users')
+
+        if mongo_manager.users_collection.find_one({'username': username}): # Username exists -> error
             error = "Username already exists. Please choose a different one."  # Set error message
+        elif password != repeat_password:
+            error = "Password not matching"
         else: # Create username 
             # Update the user data in the JSON file
-            users[username] = password
-            with open('users.json', 'w') as f:
-                json.dump(users, f)
+            user = {
+                'username': username,
+                'password': password
+            }
+            
+            mongo_manager.insert_user(user)
+            
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
     return render_template('registration.html', error=error)  # Pass error message to the template
+
+
 
 # Page with to access the input, track and recommendations pages
 @app.route('/dashboard')
@@ -96,11 +100,46 @@ def input_data():
         answer4 = request.form['question4']
         now = datetime.now()
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-        with open('answers.csv', mode='a', newline='') as file:
-            writer = csv.writer(file)
-            if os.stat('answers.csv').st_size == 0: # write header if file is empty
-                writer.writerow(['username', 'datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
-            writer.writerow([session['username'], current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)])
+
+        conn = psycopg2.connect(
+            host='postgres',
+            port='5432',
+            user='postgres',
+            password='password',
+            database='mydatabase'
+        )
+        
+        # Retrieve the username from the Flask session
+        username = session['username']
+        
+        # Create a table name based on the username
+        table_name = f'user_{username}'
+        
+        # Create the table if it doesn't exist
+        with conn.cursor() as cursor:
+            create_table_query = sql.SQL("""
+                CREATE TABLE IF NOT EXISTS {table_name} (
+                    datetime TIMESTAMP,
+                    question1 INTEGER,
+                    question2 INTEGER,
+                    question3 INTEGER,
+                    question4 INTEGER,
+                    total INTEGER
+                )
+            """).format(table_name=sql.Identifier(table_name))
+            cursor.execute(create_table_query)
+        
+        # Insert the data into the table
+        with conn.cursor() as cursor:
+            insert_query = sql.SQL("""
+                INSERT INTO {table_name} (datetime, question1, question2, question3, question4, total)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """).format(table_name=sql.Identifier(table_name))
+            cursor.execute(insert_query, (current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)))
+        
+        # Commit the transaction
+        conn.commit()
+        
         return redirect('/track')
     
     return render_template('input.html')
@@ -178,4 +217,4 @@ def recommend_data():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080)
+    app.run(debug=True)

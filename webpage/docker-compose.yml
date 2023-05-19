@@ -1,0 +1,32 @@
+version: '3'
+services:
+  flask-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    depends_on:
+      - mongo
+      - postgres
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mydatabase
+      - POSTGRES_URI=postgresql://postgres:password@postgres:5432/mydatabase
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo_data:/data/db
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5858:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=mydatabase
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
