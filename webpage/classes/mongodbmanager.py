@@ -3,7 +3,8 @@ from pymongo import MongoClient
 
 class MongoDBManager:
     def __init__(self, database_name, collection_name):
-        self.client = MongoClient('mongodb://mongo:27017/')
+        # self.client = MongoClient('mongodb://mongo:27017/')
+        self.client = MongoClient()
         self.db = self.client[database_name]
         self.users_collection = self.db[collection_name]
     

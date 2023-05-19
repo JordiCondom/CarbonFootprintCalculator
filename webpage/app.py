@@ -31,7 +31,6 @@ app.config['SECRET_KEY'] = os.urandom(24)
 @app.route('/')
 def index():
     if 'username' in session:
-        print(session)
         return redirect('/dashboard')
     else:
         session.pop('username', None)
@@ -102,13 +101,22 @@ def input_data():
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
         conn = psycopg2.connect(
+            host='localhost',
+            port=5858,
+            user='postgres',
+            password='password',
+            database='mydatabase'
+        )
+        
+        '''
+        conn = psycopg2.connect(
             host='postgres',
             port='5432',
             user='postgres',
             password='password',
             database='mydatabase'
         )
-        
+        '''
         # Retrieve the username from the Flask session
         username = session['username']
         
