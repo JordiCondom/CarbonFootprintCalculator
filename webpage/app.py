@@ -240,6 +240,8 @@ def track_data():
     fig.savefig(buf1, format='png')
     buf1.seek(0)
 
+    print("hola", buf1.getvalue())
+
     # Embed the results in the HTML output.
     data1 = base64.b64encode(buf1.getvalue()).decode()
     return render_template('track.html', plot_url1=f'data:image/png;base64,{data1}')

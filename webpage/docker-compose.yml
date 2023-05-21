@@ -16,4 +16,8 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=mydatabase
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+    external: false
