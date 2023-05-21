@@ -2,64 +2,81 @@ import datetime
 import psycopg2
 from psycopg2 import sql
 
-# Establish a connection to the PostgreSQL database
-conn = psycopg2.connect(
-    host='localhost',
-    port='5858',
-    user='postgres',
-    password='password',
-    database='mydatabase'
-)
+class PostgreSQLManager:
+    def __init__(self, host, port, user, password, database):
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+        self.database = database
 
-answer1 = 'question1'
-answer2 = 'question2'
-answer3 = 'question3'
-answer4 = 'question4'
-
-now = datetime.now()
-current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-
-conn = psycopg2.connect(
-    host='localhost',
-    port='5432',
-    user='postgres',
-    password='password',
-    database='mydatabase'
-)
-
-# Retrieve the username from the Flask session
-username = 'tonto'
-
-# Create a table name based on the username
-table_name = f'user_{username}'
-
-# Create the table if it doesn't exist
-with conn.cursor() as cursor:
-    create_table_query = sql.SQL("""
-        CREATE TABLE IF NOT EXISTS {table_name} (
-            datetime TIMESTAMP,
-            question1 INTEGER,
-            question2 INTEGER,
-            question3 INTEGER,
-            question4 INTEGER,
-            total INTEGER
+        self.conn = psycopg2.connect(
+            host=self.host,
+            port=self.port,
+            user=self.user,
+            password=self.password,
+            database=self.database
         )
-    """).format(table_name=sql.Identifier(table_name))
-    cursor.execute(create_table_query)
+    
+    def get_all_data(self, table_name):
+        with self.conn.cursor() as cursor:
+            # Select all rows from the table for the given username
+            select_query = sql.SQL("""
+                SELECT * FROM {table_name}
+            """).format(table_name=sql.Identifier(table_name))
+            cursor.execute(select_query)
 
-# Insert the data into the table
-with conn.cursor() as cursor:
-    insert_query = sql.SQL("""
-        INSERT INTO {table_name} (datetime, question1, question2, question3, question4, total)
-        VALUES (%s, %s, %s, %s, %s, %s)
-    """).format(table_name=sql.Identifier(table_name))
-    cursor.execute(insert_query, (current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)))
+            # Fetch all the results
+            user_data = cursor.fetchall()
 
-# Commit the transaction
-conn.commit()
+            # Close the cursor and connection
+            cursor.close()
+            self.conn.close()
 
-# Perform database operations
-print("hola")
+            return user_data
+    
+    def create_table(self, table_name, columns):
+        with self.conn.cursor() as cursor:
+            column_definitions = ', '.join(columns)
+            create_table_query = sql.SQL("""
+                CREATE TABLE IF NOT EXISTS {table_name} (
+                    {column_definitions}
+                )
+            """).format(
+                table_name=sql.Identifier(table_name),
+                column_definitions=sql.SQL(column_definitions)
+            )
+            cursor.execute(create_table_query)
+        self.conn.commit()
 
-# Close the database connection when finished
-conn.close()
+
+
+    
+    def insert_data(self, table_name, input_data_columns, input_data_values):
+        with self.conn.cursor() as cursor:
+            placeholders = ', '.join(['%s'] * len(input_data_columns))
+            insert_query = sql.SQL("""
+                INSERT INTO {table_name} ({column_names})
+                VALUES ({placeholders})
+            """).format(
+                table_name=sql.Identifier(table_name),
+                column_names=sql.SQL(', ').join(map(sql.Identifier, input_data_columns)),
+                placeholders=sql.SQL(placeholders)
+            )
+            cursor.execute(insert_query, input_data_values)
+        self.conn.commit()
+
+    def get_data_from_date_range(self, table_name, from_date, to_date):
+        with self.conn.cursor() as cursor:
+            select_query = sql.SQL("""
+                SELECT * FROM {table_name}
+                WHERE datetime >= {from_date} AND datetime <= {to_date}
+            """).format(
+                table_name=sql.Identifier(table_name),
+                from_date=sql.Literal(from_date),
+                to_date=sql.Literal(to_date)
+            )
+            cursor.execute(select_query)
+
+            data = cursor.fetchall()
+            return data

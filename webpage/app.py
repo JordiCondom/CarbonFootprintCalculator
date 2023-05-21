@@ -6,9 +6,12 @@ from flask import Flask, redirect, render_template, request, session, make_respo
 from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
+from classes.graphcreator import graphCreator
 from classes.mongodbmanager import MongoDBManager
 import psycopg2
 from psycopg2 import sql
+
+from classes.postgresqlmanager import PostgreSQLManager
 
 session_cookie_path = './session_cookie'
 if os.path.exists(session_cookie_path):
@@ -78,7 +81,7 @@ def register():
     return render_template('registration.html', error=error)  # Pass error message to the template
 
 # Page with to access the input, track and recommendations pages
-@app.route('/dashboard')
+@app.route('/dashboard',  methods=['GET', 'POST'])
 def dashboard():
     if 'username' in session:
         return render_template('dashboard.html', username=session['username'])
@@ -95,16 +98,10 @@ def input_data():
         answer3 = request.form['question3']
         answer4 = request.form['question4']
         now = datetime.now()
-        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        current_time = now.strftime("%Y-%m-%d %H:%M")
 
-        conn = psycopg2.connect(
-            host='localhost',
-            port=5858,
-            user='postgres',
-            password='password',
-            database='mydatabase'
-        )
-        
+        postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
+    
         '''
         conn = psycopg2.connect(
             host='postgres',
@@ -119,138 +116,86 @@ def input_data():
         
         # Create a table name based on the username
         table_name = f'user_{username}'
+        columns = [
+            'datetime TIMESTAMP',
+            'question1 INTEGER',
+            'question2 INTEGER',
+            'question3 INTEGER',
+            'question4 INTEGER',
+            'total INTEGER',
+        ]
+
+        postgresql_manager.create_table(table_name, columns)
         
-        # Create the table if it doesn't exist
-        with conn.cursor() as cursor:
-            create_table_query = sql.SQL("""
-                CREATE TABLE IF NOT EXISTS {table_name} (
-                    datetime TIMESTAMP,
-                    question1 INTEGER,
-                    question2 INTEGER,
-                    question3 INTEGER,
-                    question4 INTEGER,
-                    total INTEGER
-                )
-            """).format(table_name=sql.Identifier(table_name))
-            cursor.execute(create_table_query)
-        
-        # Insert the data into the table
-        with conn.cursor() as cursor:
-            insert_query = sql.SQL("""
-                INSERT INTO {table_name} (datetime, question1, question2, question3, question4, total)
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """).format(table_name=sql.Identifier(table_name))
-            cursor.execute(insert_query, (current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)))
-        
-        # Commit the transaction
-        conn.commit()
+        input_data_columns = ['datetime', 'question1', 'question2', 'question3', 'question4', 'total']
+        input_data_values = [current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)]
+
+        postgresql_manager.insert_data(table_name, input_data_columns, input_data_values)
         
         return redirect('/track')
     
     return render_template('input.html')
 
-# Tracking data page, with the graphs and any required tracking data tool
-@app.route('/track')
+@app.route('/track', methods=['GET', 'POST'])
 def track_data():
-    # Get the data for the current user from the answers.csv file
+    error = None
+    graph_data = None
+
+    if request.method == 'POST':
+        from_date = request.form.get('fromDate')
+        to_date = request.form.get('toDate')
+
+        if from_date > to_date:
+            error = "Watch out, the start date is later than the end date!"
+        else:
+            # Get the data for the current user from the database
+            username = session['username']
+            postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
+            user_data = postgresql_manager.get_data_from_date_range(f'user_{username}', from_date, to_date)
+
+            if user_data:
+                df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
+                
+                # Create a dictionary to store the data for each date
+                dates = sorted(list(set(df['datetime'])))
+                date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
+
+                graph_manager = graphCreator(df, dates, date_data)
+                graph_data = graph_manager.create_tracking_graphs()
+
+                return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+            else:
+                error = "No data available for this range of dates"
+
+    # Get the data for the current user from the database
     username = session['username']
+    postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
+    user_data = postgresql_manager.get_all_data(f'user_{username}')
 
-    conn = psycopg2.connect(
-            host='localhost',
-            port=5858,
-            user='postgres',
-            password='password',
-            database='mydatabase'
-        )
-    
-    # Retrieve the username from the Flask session
-    username = session['username']
-        
-    # Create a table name based on the username
-    table_name = f'user_{username}' 
+    if user_data:
+        df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
 
-    with conn.cursor() as cursor:
-        # Select all rows from the table for the given username
-        select_query = sql.SQL("""
-            SELECT * FROM {table_name}
-        """).format(table_name=sql.Identifier(table_name))
-        cursor.execute(select_query)
+        # Create a dictionary to store the data for each date
+        dates = sorted(list(set(df['datetime'])))
+        date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
 
-        # Fetch all the results
-        user_data = cursor.fetchall()
+        graph_manager = graphCreator(df, dates, date_data)
+        graph_data = graph_manager.create_tracking_graphs()
+    else:
+        error = "No data available for this user"
 
-        # Close the cursor and connection
-        cursor.close()
-        conn.close()
-
-    df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
-
-
-    # Create a dictionary to store the data for each date
-    dates = sorted(list(set(df['datetime'])))
-    date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
-
-    # Extract the data for each date
-    for _, row in df.iterrows():
-        date = row['datetime']
-        date_data[date]['food'].append(row['food'])
-        date_data[date]['transportation'].append(row['transportation'])
-        date_data[date]['household'].append(row['household'])
-        date_data[date]['expenses'].append(row['expenses'])
-        date_data[date]['total'].append(row['total'])
-
-    # Generate the figure **without using pyplot**.
-    fig = Figure(figsize=(10, 10))
-    gs = fig.add_gridspec(2, 2)
-    ax1 = fig.add_subplot(gs[0, :])
-    ax2 = fig.add_subplot(gs[1, 0])
-    ax3 = fig.add_subplot(gs[1, 1])
-
-    # Plot the data for each date and connect the points
-    for date in dates:
-        x = ['food', 'transportation', 'household', 'expenses']
-        y = [np.mean(date_data[date]['food']),
-             np.mean(date_data[date]['transportation']),
-             np.mean(date_data[date]['household']),
-             np.mean(date_data[date]['expenses'])]
-        ax1.plot(x, y, label=date, marker='o')
-        ax1.plot(x, y, 'k--', alpha=0.5)
-
-    ax1.set_xlabel('Question')
-    ax1.set_ylabel('Answer')
-    ax1.legend()
-
-    # Create a pie chart for the expense categories
-    expense_labels = ['Food', 'Transportation', 'Household', 'Expenses']
-    expense_values = [
-        np.sum(df['food']),
-        np.sum(df['transportation']),
-        np.sum(df['household']),
-        np.sum(df['expenses'])
-    ]
-    ax2.pie(expense_values, labels=expense_labels, autopct='%1.1f%%')
-    ax2.set_aspect('equal')  # Equal aspect ratio ensures the pie is circular
-
-    ax3.plot(df['datetime'], df['total'])
-    ax3.set_xlabel('Datetime')
-    ax3.set_ylabel('Total')
-
-    # Save the figures to a temporary buffer.
-    buf1 = io.BytesIO()
-    fig.savefig(buf1, format='png')
-    buf1.seek(0)
-
-    print("hola", buf1.getvalue())
-
-    # Embed the results in the HTML output.
-    data1 = base64.b64encode(buf1.getvalue()).decode()
-    return render_template('track.html', plot_url1=f'data:image/png;base64,{data1}')
+    return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
 
 # Recommendations page
 @app.route('/recommend')
 def recommend_data():
     return render_template('recommend.html')
 
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)  # Remove the 'username' key from the session
+    return redirect('/login')
 
 if __name__ == '__main__':
     app.run(debug=True)
