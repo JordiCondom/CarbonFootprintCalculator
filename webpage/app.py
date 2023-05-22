@@ -87,38 +87,32 @@ def dashboard():
     if 'username' in session:
         return render_template('dashboard.html', username=session['username'])
     else:
-        return redirect('/login')
-    
+        return redirect('/logout')
 
 # Questionnaire/Survey page
 @app.route('/input', methods=['GET', 'POST'])
 def input_data():
+    if 'username' not in session: 
+        return redirect('/logout')
+    
     if request.method == 'POST':
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
         answer1 = request.form['question1']
         answer2 = request.form['question2']
         answer3 = request.form['question3']
         answer4 = request.form['question4']
-        now = datetime.now()
-        current_time = now.strftime("%Y-%m-%d %H:%M")
+        total = int(answer1) + int(answer2) + int(answer3) + int(answer4)
 
         postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
-    
-        '''
-        conn = psycopg2.connect(
-            host='postgres',
-            port='5432',
-            user='postgres',
-            password='password',
-            database='mydatabase'
-        )
-        '''
+        #  postgresql_manager = PostgreSQLManager('postgres','5432','postgres','password','mydatabase')
+
         # Retrieve the username from the Flask session
         username = session['username']
         
         # Create a table name based on the username
         table_name = f'user_{username}'
         columns = [
-            'datetime TIMESTAMP',
+            'datetime DATE',
             'question1 INTEGER',
             'question2 INTEGER',
             'question3 INTEGER',
@@ -126,10 +120,12 @@ def input_data():
             'total INTEGER',
         ]
 
+        # Create table if doesn't exist
         postgresql_manager.create_table(table_name, columns)
         
+        # Input data to created table
         input_data_columns = ['datetime', 'question1', 'question2', 'question3', 'question4', 'total']
-        input_data_values = [current_time, answer1, answer2, answer3, answer4, int(answer1) + int(answer2) + int(answer3) + int(answer4)]
+        input_data_values = [current_time, answer1, answer2, answer3, answer4, total]
 
         postgresql_manager.insert_data(table_name, input_data_columns, input_data_values)
         
@@ -139,10 +135,13 @@ def input_data():
 
 @app.route('/track', methods=['GET', 'POST'])
 def track_data():
+    if 'username' not in session: 
+        return redirect('/logout')
     error = None
     graph_data = None
     username = session['username']
     redis_manager = RedisManager('localhost', 6379, 0)
+    postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
 
     if request.method == 'POST':
         from_date = request.form.get('fromDate')
@@ -156,7 +155,6 @@ def track_data():
                 return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
             else:
                 # Get the data for the current user from the database
-                postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
                 user_data = postgresql_manager.get_data_from_date_range(f'user_{username}', from_date, to_date)
 
                 if user_data:
@@ -170,28 +168,31 @@ def track_data():
                     graph_data = graph_manager.create_tracking_graphs()
                     redis_manager.set_key_value(key, graph_data)
 
-                    return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+                    return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', 
+                                           error=error, 
+                                           from_date = from_date,
+                                           to_date = to_date)
                 else:
                     error = "No data available for this range of dates"
 
     # Get the data for the current user from the database
-    username = session['username']
-    postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
     user_data = postgresql_manager.get_all_data(f'user_{username}')
 
     if user_data:
         df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
-
-        earliest_date = df['datetime'].min()
-        latest_date = df['datetime'].max()
-
-        key = str(username) + str(earliest_date) + str(latest_date)
+        
+        from_date = df['datetime'].min()
+        to_date = df['datetime'].max()
+        
+        key = str(username) + str(from_date) + str(to_date)
 
         if (redis_manager.key_exists_boolean(key)):
             graph_data = redis_manager.get_value_by_key(key)
-            return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+            return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', 
+                                   error=error,
+                                   from_date = from_date,
+                                   to_date = to_date)
         else:
-            # Create a dictionary to store the data for each date
             dates = sorted(list(set(df['datetime'])))
             date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
 
@@ -206,6 +207,8 @@ def track_data():
 # Recommendations page
 @app.route('/recommend')
 def recommend_data():
+    if 'username' not in session: 
+        return redirect('/logout')
     return render_template('recommend.html')
 
 
