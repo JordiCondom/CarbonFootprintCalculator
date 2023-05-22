@@ -18,6 +18,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis_data:/data
+
 volumes:
   postgres_data:
     external: false
+  redis_data:

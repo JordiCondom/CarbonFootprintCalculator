@@ -12,6 +12,7 @@ import psycopg2
 from psycopg2 import sql
 
 from classes.postgresqlmanager import PostgreSQLManager
+from classes.redismanager import RedisManager
 
 session_cookie_path = './session_cookie'
 if os.path.exists(session_cookie_path):
@@ -140,32 +141,38 @@ def input_data():
 def track_data():
     error = None
     graph_data = None
+    username = session['username']
+    redis_manager = RedisManager('localhost', 6379, 0)
 
     if request.method == 'POST':
         from_date = request.form.get('fromDate')
         to_date = request.form.get('toDate')
-
+        key = str(username) + str(from_date) + str(to_date)
         if from_date > to_date:
             error = "Watch out, the start date is later than the end date!"
         else:
-            # Get the data for the current user from the database
-            username = session['username']
-            postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
-            user_data = postgresql_manager.get_data_from_date_range(f'user_{username}', from_date, to_date)
-
-            if user_data:
-                df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
-                
-                # Create a dictionary to store the data for each date
-                dates = sorted(list(set(df['datetime'])))
-                date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
-
-                graph_manager = graphCreator(df, dates, date_data)
-                graph_data = graph_manager.create_tracking_graphs()
-
+            if (redis_manager.key_exists_boolean(key)):
+                graph_data = redis_manager.get_value_by_key(key)
                 return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
             else:
-                error = "No data available for this range of dates"
+                # Get the data for the current user from the database
+                postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
+                user_data = postgresql_manager.get_data_from_date_range(f'user_{username}', from_date, to_date)
+
+                if user_data:
+                    df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
+
+                    # Create a dictionary to store the data for each date
+                    dates = sorted(list(set(df['datetime'])))
+                    date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
+
+                    graph_manager = graphCreator(df, dates, date_data)
+                    graph_data = graph_manager.create_tracking_graphs()
+                    redis_manager.set_key_value(key, graph_data)
+
+                    return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+                else:
+                    error = "No data available for this range of dates"
 
     # Get the data for the current user from the database
     username = session['username']
@@ -175,12 +182,22 @@ def track_data():
     if user_data:
         df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
 
-        # Create a dictionary to store the data for each date
-        dates = sorted(list(set(df['datetime'])))
-        date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
+        earliest_date = df['datetime'].min()
+        latest_date = df['datetime'].max()
 
-        graph_manager = graphCreator(df, dates, date_data)
-        graph_data = graph_manager.create_tracking_graphs()
+        key = str(username) + str(earliest_date) + str(latest_date)
+
+        if (redis_manager.key_exists_boolean(key)):
+            graph_data = redis_manager.get_value_by_key(key)
+            return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+        else:
+            # Create a dictionary to store the data for each date
+            dates = sorted(list(set(df['datetime'])))
+            date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
+
+            graph_manager = graphCreator(df, dates, date_data)
+            graph_data = graph_manager.create_tracking_graphs()
+            redis_manager.set_key_value(key, graph_data)
     else:
         error = "No data available for this user"
 
