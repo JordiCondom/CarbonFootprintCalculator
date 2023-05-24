@@ -6,6 +6,8 @@ from flask import Flask, redirect, render_template, request, session, make_respo
 from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
+from classes.airportFootprintManager import AirportFootprintManager
+from classes.footprintcalculator import footprintCalculator
 from classes.graphcreator import graphCreator
 from classes.mongodbmanager import MongoDBManager
 import psycopg2
@@ -95,12 +97,42 @@ def input_data():
     if 'username' not in session: 
         return redirect('/logout')
     
+    airportManager = AirportFootprintManager()
+    airport_names = airportManager.list_airport_names()
+
     if request.method == 'POST':
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
-        answer1 = request.form['question1']
-        answer2 = request.form['question2']
-        answer3 = request.form['question3']
-        answer4 = request.form['question4']
+
+        response_data = {
+            'answerDiet': request.form['diet'],
+            'answerCarType': request.form.get('carType', ''),
+            'answerCarDistance': request.form['carDistance'],
+            'answerBusDistance': request.form['busDistance'],
+            'answerTrainDistance': request.form['trainDistance'],
+            'origin_airports': request.form.getlist('origin[]'),
+            'destination_airports': request.form.getlist('destination[]'),
+            'cabin_classes': request.form.getlist('cabin_class[]'),
+            'round_trips': request.form.getlist('round_trip[]'),
+            'answerShoppingProfile': request.form['shoppingProfile'],
+            'answerPhoneLaptop': request.form['phoneLaptopQuestion'],
+        }
+
+        print(response_data)
+
+        carbon_footprint_manager = footprintCalculator(response_data, 7)
+        carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
+        print(carbon_footprint)
+
+        
+        
+        # TODO housing
+        
+    
+
+        answerWasteMaterials = request.form.getlist('wasteMaterials[]')
+        print("answerWasteMaterials ", answerWasteMaterials)
+
+        '''
         total = int(answer1) + int(answer2) + int(answer3) + int(answer4)
 
         postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
@@ -130,8 +162,8 @@ def input_data():
         postgresql_manager.insert_data(table_name, input_data_columns, input_data_values)
         
         return redirect('/track')
-    
-    return render_template('input.html')
+        '''
+    return render_template('input.html', airports=airport_names)
 
 @app.route('/track', methods=['GET', 'POST'])
 def track_data():

@@ -10,14 +10,42 @@ body {
     margin: 0;
   }
 
+  .buttonblue {
+    background-color: #61a1e2;
+    color: #fff;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 3px;
+  }
+  
+  .buttonblue:hover {
+    background-color: #4286f4;
+  }
+
+  .removeFlightButton {
+    background-color: #61a1e2;
+    color: #fff;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 3px;
+  }
+  
+  .removeFlightButton:hover {
+    background-color: #4286f4;
+  }
+
   .logout-button {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: linear-gradient(to right, #ff0000, #cc0000);
-    color: white; /* Optional: Set the text color to white for better visibility */
+    background-color: #cc0000;
+    color: #fff; /* Optional: Set the text color to white for better visibility */
     padding: 8px 16px; /* Optional: Add padding to the button for better appearance */
-    border-radius: 0.25rem;
+    border-radius: 3px;
+  }
+
+  .logout-button:hover {
+    background-color: #ff0000;
   }
   
 
@@ -35,14 +63,31 @@ body {
     margin: 1rem;
     color: green;
   }
+
+  h2 {
+    color: rgb(123, 219, 123);
+  }
+
+  h3 {
+    color: #61a1e2;
+  }
   
   /* Style the form labels and inputs */
   label {
     font-size: 1.2rem;
-    margin: 0.5rem;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  input[type="text"],
+  select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-bottom: 10px;
   }
   
-  input[type="text"],
   input[type="password"],
   input[type="radio"] {
     font-size: 1.2rem;
