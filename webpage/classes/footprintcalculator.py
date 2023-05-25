@@ -4,9 +4,9 @@ from classes.airportFootprintManager import AirportFootprintManager
 
 
 class footprintCalculator:
-    def __init__(self, data, number_of_days):
+    def __init__(self, data):
         self.data = data
-        self.number_of_days = number_of_days
+        self.number_of_days = self.data['number_of_days']
 
     def computeCarbonFootprint(self):
         diet = self.computeDietCarbonFootprint()

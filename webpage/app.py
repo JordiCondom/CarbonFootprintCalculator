@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
 from classes.airportFootprintManager import AirportFootprintManager
+from classes.datesManager import DatesManager
 from classes.footprintcalculator import footprintCalculator
 from classes.graphcreator import graphCreator
 from classes.mongodbmanager import MongoDBManager
@@ -103,7 +104,25 @@ def input_data():
     if request.method == 'POST':
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
 
+        date_range_type = request.form.get('date-range')
+        start_date = request.form.get('start-date')
+        end_date = request.form.get('end-date')
+
+        dates_manager = DatesManager(date_range_type, start_date, end_date)
+
+        start_date = dates_manager.get_start_date()
+        end_date = dates_manager.get_end_date()
+        number_of_days = dates_manager.get_number_of_days()
+
+        print("START DATE: ", start_date)
+        print("END DATE: ", end_date)
+        print("NUMBER OF DAYS: ", number_of_days)
+
+
         response_data = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'number_of_days': number_of_days,
             'answerDiet': request.form['diet'],
             'answerCarType': request.form.get('carType', ''),
             'answerCarDistance': request.form['carDistance'],
@@ -117,11 +136,11 @@ def input_data():
             'answerPhoneLaptop': request.form['phoneLaptopQuestion'],
         }
 
-        print(response_data)
+        print("RESPONSE DATA: ", response_data)
 
-        carbon_footprint_manager = footprintCalculator(response_data, 7)
+        carbon_footprint_manager = footprintCalculator(response_data)
         carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
-        print(carbon_footprint)
+        print("CARBON FOOTPRINT: ", carbon_footprint)
 
         
         

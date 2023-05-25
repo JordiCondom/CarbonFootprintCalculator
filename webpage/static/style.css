@@ -69,7 +69,7 @@ body {
   }
 
   h3 {
-    color: #61a1e2;
+    color: #024487;
   }
   
   /* Style the form labels and inputs */
@@ -80,6 +80,7 @@ body {
   }
 
   input[type="text"],
+  input[type="password"],
   select {
     width: 100%;
     padding: 5px;
@@ -88,7 +89,7 @@ body {
     margin-bottom: 10px;
   }
   
-  input[type="password"],
+  
   input[type="radio"] {
     font-size: 1.2rem;
     margin: 0.5rem;

@@ -9,6 +9,28 @@
     <a href="/logout" class="logout-button">Logout</a>
     <h1>Input Data</h1>
     <form action="/input" method="POST">
+      
+      <div id="Dates">
+        <h1>Date Range Selection</h1>
+        <label><input type="radio" name="date-range" value="last-week" onclick="showCalendars()">Last Week</label>
+        <br>
+        <label><input type="radio" name="date-range" value="last-month" onclick="showCalendars()">Last Month</label>
+        <br>
+        <label><input type="radio" name="date-range" value="last-year" onclick="showCalendars()">Last Year</label>
+        <br>
+        <label><input type="radio" name="date-range" value="range-dates" id="select-dates" onclick="showCalendars()">Select Dates</label>
+        <br>
+        <div class="calendar" style="display: none;">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date" name="start-date">
+            <br>
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date" name="end-date">
+        </div>
+      </div>
+
+
+
       <div id="Food">
         <h1>Food</h1>
         <label>What kind of diet do you follow?</label><br>
@@ -368,23 +390,23 @@
     }
 
     function handleAirportInput(inputElement, selectElement) {
-    const inputText = inputElement.value.toLowerCase();
-    const options = selectElement.options;
+      const inputText = inputElement.value.toLowerCase();
+      const options = selectElement.options;
 
-    // Show/hide options based on input text for airport select element
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i];
-      const optionText = option.text.toLowerCase();
-      if (optionText.indexOf(inputText) > -1) {
-        option.style.display = '';
-      } else {
-        option.style.display = 'none';
+      // Show/hide options based on input text for airport select element
+      for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        const optionText = option.text.toLowerCase();
+        if (optionText.indexOf(inputText) > -1) {
+          option.style.display = '';
+        } else {
+          option.style.display = 'none';
+        }
       }
-    }
 
-    // Show the select element for airport if there are matching options, hide it otherwise
-    selectElement.style.display = selectElement.options.length > 0 ? '' : 'none';
-  }
+      // Show the select element for airport if there are matching options, hide it otherwise
+      selectElement.style.display = selectElement.options.length > 0 ? '' : 'none';
+    }
 
 
     const flightContainer = document.getElementById('flightContainer');
@@ -394,6 +416,19 @@
         flightContainer.removeChild(flightInputs);
       }
     });
+
+    function showCalendars() {
+      const calendarDiv = document.querySelector('.calendar');
+      const dateRangeInputs = document.querySelectorAll('input[name="date-range"]');
+      
+      if (calendarDiv) {
+        if (dateRangeInputs[3].checked) {
+          calendarDiv.style.display = 'block';
+        } else {
+          calendarDiv.style.display = 'none';
+        }
+      }
+    }
   </script>
   </body>
 </html>
