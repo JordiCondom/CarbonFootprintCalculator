@@ -36,6 +36,9 @@
               <label for="end-date">End Date:</label>
               <input type="date" id="end-date" name="end-date">
           </div>
+          {% if error %}
+          <p style="color: red">{{ error }}</p>
+          {% endif %}
         </div>
       </section>
       

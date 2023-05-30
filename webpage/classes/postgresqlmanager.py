@@ -83,3 +83,11 @@ class PostgreSQLManager:
 
             data = cursor.fetchall()
             return data
+
+    def delete_table_data(self, table_name):
+        with self.conn.cursor() as cursor:
+            delete_query = sql.SQL("""
+                DELETE FROM {table_name}
+            """).format(table_name=sql.Identifier(table_name))
+            cursor.execute(delete_query)
+        self.conn.commit()

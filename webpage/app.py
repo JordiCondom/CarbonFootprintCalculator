@@ -2,6 +2,7 @@ import base64
 import io
 import os
 from datetime import datetime
+import time
 from flask import Flask, redirect, render_template, request, session, make_response
 from matplotlib.figure import Figure
 import numpy as np
@@ -110,6 +111,8 @@ def input_data():
     if 'username' not in session: 
         return redirect('/logout')
     
+    error = None
+    username = session['username']
     airportManager = AirportFootprintManager()
     airport_names = airportManager.list_airport_names()
 
@@ -124,11 +127,32 @@ def input_data():
         end_date = dates_manager.get_end_date()
         number_of_days = dates_manager.get_number_of_days()
 
+        redis_manager = RedisManager('localhost', 6379, 1)
+
+
         print("START DATE: ", start_date)
         print("END DATE: ", end_date)
         print("NUMBER OF DAYS: ", number_of_days)
 
+       # Example usage
 
+        # Convert start_date and end_date to range_start and range_end as timestamps
+        range_start = time.mktime(start_date.timetuple())
+        range_end = time.mktime(end_date.timetuple())
+
+        overlapping_ranges = redis_manager.dates_overlap(range_start, range_end)
+        if overlapping_ranges:
+            for overlapping_range in overlapping_ranges:
+                range_id = redis_manager.get_value_by_key(overlapping_range.decode())
+                error = f"New range of dates overlaps with existing range {range_id}"
+                # Handle the error message
+        else:
+            # Insert the range into Redis since there are no overlapping ranges
+            range_id = str(username) + str(start_date) + str(end_date)
+            redis_manager.insert_range_dates(range_start, range_end, range_id)
+            
+            
+        
         response_data = {
             'start_date': start_date,
             'end_date': end_date,
@@ -157,16 +181,11 @@ def input_data():
             'answerPhoneLaptop': request.form.getlist('phoneLaptopQuestion[]'),
         }
 
-        print("RESPONSE DATA: ")
-        print(response_data)
-
-        
-
         postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
         #  postgresql_manager = PostgreSQLManager('postgres','5432','postgres','password','mydatabase')
 
         # Retrieve the username from the Flask session
-        username = session['username']
+        
         
         # SAVE ANSWERS
         table_name_answers = f'user_{username}_answers'
@@ -206,8 +225,6 @@ def input_data():
         # SAVE CARBON FOOTPRINT
         carbon_footprint_manager = footprintCalculator(response_data)
         carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
-        print("CARBON FOOTPRINT: ")
-        print(carbon_footprint)
 
         table_name_carbon = f'user_{username}_carbon_footprint'
         columns_cf = [
@@ -227,12 +244,6 @@ def input_data():
 
         postgresql_manager.insert_data(table_name_carbon,carbon_footprint)
         
-        print("ANSWERS DATA: ")
-        print(postgresql_manager.get_all_data(table_name_answers))
-
-        print("CARBON FOOTPRINT DATA: ")
-        print(postgresql_manager.get_all_data(table_name_carbon))
-        
         postgresql_manager.close_connection()
 
         return redirect('/track')
@@ -249,7 +260,8 @@ def track_data():
     username = session['username']
     table_name_carbon = f'user_{username}_carbon_footprint'
     redis_manager = RedisManager('localhost', 6379, 0)
-    postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
+    #postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
+    graph_creator = graphCreator()
 
     spark_manager = SparkManager(spark)
     if request.method == 'POST':
@@ -277,7 +289,7 @@ def track_data():
 
                     print("values: ", pie_variable_values)
 
-                    piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values)])
+                    piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values,hole=0.5)])
 
                     # Convert the figure to a JSON string
                     pie_graph_data = piefig.to_json()
@@ -285,11 +297,14 @@ def track_data():
                     # TODO, store json as a string
 
                     # Pass the graph data to the HTML template
-                    return render_template('track.html', pie_graph_data=pie_graph_data, error=error, from_date=from_date, to_date=to_date)
+                    return render_template('track.html', pie_graph_data=pie_graph_data, 
+                                           horizontal_bar_data=horizontal_bar_data,
+                                           error=error, from_date=from_date, to_date=to_date)
                 
 
                 else:
                     error = "No data available for this range of dates"
+
 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
     print(df.show())
@@ -350,7 +365,8 @@ def track_data():
     else:
         error = "No data available for this user"
     '''
-
+    # ---------------------------------------------------------------------------------------------------------------------
+    # PIE CHART
     pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
     # Calculate the sum of each column for each pie_label
     sum_values = [F.sum(col).alias(label) for label, col in zip(pie_labels, pie_labels)]
@@ -358,25 +374,78 @@ def track_data():
 
     # Retrieve the sum values
     pie_variable_values = list(result.first().asDict().values())
+    
+    pie_graph_data = graph_creator.create_pie_chart(pie_labels, pie_variable_values)
 
-    print("values: ", pie_variable_values)
+    # ---------------------------------------------------------------------------------------------------------------------
+    # Horizontal bars
 
-    piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values)])
+    #mock data:
+    min_start_date = df.select(F.min("start_date")).first()[0]
+    max_end_date = df.select(F.max("end_date")).first()[0]
+    number_of_days = (max_end_date - min_start_date).days
 
-    # Convert the figure to a JSON string
-    pie_graph_data = piefig.to_json()
+    total_sum = df.select(F.sum("total")).first()[0]
+    annual_average_in_tons = (total_sum/number_of_days)*(365/1000)
+    country_average = 0.2
+    global_average = 4.5
+    global_objective = 0.5
 
-    # TODO, store json as a string
+    x = [annual_average_in_tons, country_average, global_average, global_objective]
+    y = ["annual_average_in_tons", "country_average", "global_average", "global_objective"]
+
+    horizontal_bar_fig = go.Figure()
+
+    horizontal_bar_fig.add_trace(go.Bar(
+        x=x,
+        y=y,
+        marker=dict(
+            color='rgba(50, 171, 96, 0.6)',
+            line=dict(
+                color='rgba(50, 171, 96, 1.0)',
+                width=1),
+        ),
+        name='CO2 emissions 1',
+        orientation='h',
+    ))
+
+    horizontal_bar_fig.update_layout(
+        title='CO2 emissions 2',
+        yaxis=dict(
+            showgrid=False,
+            showline=False,
+            showticklabels=True,
+        ),
+        xaxis=dict(
+            zeroline=False,
+            showline=False,
+            showticklabels=True,
+            showgrid=True,
+        ),
+        legend=dict(
+            x=0.029,
+            y=1.038,
+            font_size=10
+        ),
+        margin=dict(l=100, r=20, t=70, b=70),
+        paper_bgcolor='rgb(248, 248, 255)',
+        plot_bgcolor='rgb(248, 248, 255)',
+    )
+
+    """
+    horizontal_bar_fig = go.Figure(go.Bar(
+        x = x,
+        y = y,
+        orientation='h'
+    ))
+    """
+
+    horizontal_bar_data = horizontal_bar_fig.to_json()
 
     # Pass the graph data to the HTML template
-    return render_template('track.html', pie_graph_data=pie_graph_data, error=error, from_date=from_date, to_date=to_date)
-
-# Recommendations page
-@app.route('/recommend')
-def recommend_data():
-    if 'username' not in session: 
-        return redirect('/logout')
-    return render_template('recommend.html')
+    return render_template('track.html', pie_graph_data=pie_graph_data, 
+                           horizontal_bar_data=horizontal_bar_data,
+                           error=error, from_date=from_date, to_date=to_date)
 
 
 @app.route('/logout')
