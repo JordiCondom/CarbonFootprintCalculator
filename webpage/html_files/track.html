@@ -3,6 +3,7 @@
 <head>
 	<title>Track Data</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
 
@@ -29,9 +30,25 @@
 	  </form>
 	
 	<p>Here's a plot of the data from {{from_date }} to {{to_date}}:</p>
-	
-	<img src="{{ plot_url1 }}" alt="Plot">
+	<div id="chart"></div>
     <a href="/dashboard" class="button">Back to Dashboard</a>
 </div>
+<script>
+	// Retrieve the graph data from the Flask route
+	var pieGraphData = {{ pie_graph_data | tojson | safe }};
+
+	// Parse the JSON data
+	var data = JSON.parse(pieGraphData);
+	console.log(data)
+	// Configure the chart layout
+	var layout = {
+		title: 'Pie Chart',
+		height: 400,
+		width: 500
+	};
+
+	// Display the pie chart
+	Plotly.newPlot('chart', data, layout);
+</script>
 </body>
 </html>

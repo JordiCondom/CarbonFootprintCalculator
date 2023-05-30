@@ -18,6 +18,9 @@ class PostgreSQLManager:
             database=self.database
         )
     
+    def close_connection(self):
+        self.conn.close()
+
     def get_all_data(self, table_name):
         with self.conn.cursor() as cursor:
             # Select all rows from the table for the given username
@@ -31,7 +34,6 @@ class PostgreSQLManager:
 
             # Close the cursor and connection
             cursor.close()
-            self.conn.close()
 
             return user_data
     
@@ -49,10 +51,10 @@ class PostgreSQLManager:
             cursor.execute(create_table_query)
         self.conn.commit()
 
+    def insert_data(self, table_name, response_data):
+        input_data_columns = [key.lower() for key in response_data.keys()]
+        input_data_values = list(response_data.values())
 
-
-    
-    def insert_data(self, table_name, input_data_columns, input_data_values):
         with self.conn.cursor() as cursor:
             placeholders = ', '.join(['%s'] * len(input_data_columns))
             insert_query = sql.SQL("""
@@ -64,13 +66,14 @@ class PostgreSQLManager:
                 placeholders=sql.SQL(placeholders)
             )
             cursor.execute(insert_query, input_data_values)
+            
         self.conn.commit()
 
     def get_data_from_date_range(self, table_name, from_date, to_date):
         with self.conn.cursor() as cursor:
             select_query = sql.SQL("""
                 SELECT * FROM {table_name}
-                WHERE datetime >= {from_date} AND datetime <= {to_date}
+                WHERE start_date >= {from_date} AND end_date <= {to_date}
             """).format(
                 table_name=sql.Identifier(table_name),
                 from_date=sql.Literal(from_date),

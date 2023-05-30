@@ -5,161 +5,197 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
   <body>
+    <header>
+      <nav>
+        <a href="#dates" class="active">Dates</a>
+        <a href="#food">Food</a>
+        <a href="#transportation">Transportation</a>
+        <a href="#housing">Housing</a>
+        <a href="#waste">Waste</a>
+        <a href="#consumption">Consumption</a>
+        <a href="/logout" class="logout-button">Logout</a>
+      </nav>
+    </header>
   <div class="container">
-    <a href="/logout" class="logout-button">Logout</a>
-    <h1>Input Data</h1>
     <form action="/input" method="POST">
-      
-      <div id="Dates">
-        <h1>Date Range Selection</h1>
-        <label><input type="radio" name="date-range" value="last-week" onclick="showCalendars()" required>Last Week</label>
-        <br>
-        <label><input type="radio" name="date-range" value="last-month" onclick="showCalendars()">Last Month</label>
-        <br>
-        <label><input type="radio" name="date-range" value="last-year" onclick="showCalendars()">Last Year</label>
-        <br>
-        <label><input type="radio" name="date-range" value="range-dates" id="select-dates" onclick="showCalendars()">Select Dates</label>
-        <br>
-        <div class="calendar" style="display: none;">
-            <label for="start-date">Start Date:</label>
-            <input type="date" id="start-date" name="start-date">
-            <br>
-            <label for="end-date">End Date:</label>
-            <input type="date" id="end-date" name="end-date">
-        </div>
-      </div>
-
-
-
-      <div id="Food">
-        <h1>Food</h1>
-        <label>What kind of diet do you follow?</label><br>
-        <label><input type="radio" name="diet" value="Vegan" required> Vegan </label><br>
-        <label><input type="radio" name="diet" value="Vegetarian"> Vegetarian </label><br>
-        <label><input type="radio" name="diet" value="Pescetarian"> Pescetarian </label><br>
-        <label><input type="radio" name="diet" value="Some_meat"> Some meat (< 50 g/day) </label><br>
-        <label><input type="radio" name="diet" value="Regular_meat"> Regular meat (50-100 g/day) </label><br>
-        <label><input type="radio" name="diet" value="Heavy_meat"> Heavy meat (> 100 g/day) </label><br><br>
-      </div>
-
-
-      <div id="Transportation">
-        <h1>Tranportation</h1>
-        <label>What means of transportation have you used?</label><br>
-        <label><input type="checkbox" name="meansOfTransportation[]" value="Car"> Car</label><br>
-        <label><input type="checkbox" name="meansOfTransportation[]" value="Motorbke"> Motorbike (need to find data?)</label><br>
-        <label><input type="checkbox" name="meansOfTransportation[]" value="Bus"> Bus</label><br>
-        <label><input type="checkbox" name="meansOfTransportation[]" value="Train"> Train</label><br>
-        <label><input type="checkbox" name="meansOfTransportation[]" value="Plane"> Plane</label><br><br>
-
-
-        <div id="carQuestion" style="display: none;">
-        <h2>Car information</h2>
-          <label>What kind of energy source does your car use?</label><br>
-          <label><input type="radio" name="carType" value="Gasoline">Gasoline</label><br>
-          <label><input type="radio" name="carType" value="Diesel">Diesel</label><br>
-          <label><input type="radio" name="carType" value="Plug-in Hybrid Electric">Plug-in Hybrid Electric</label><br>
-          <label><input type="radio" name="carType" value="Electric">Electric</label><br>
-          <label><input type="radio" name="carType" value="I don't know">I don't know</label><br><br>
-
-          <label>How many km did you drive your car for?</label><br>
-          <input type="text" name="carDistance"><br><br>
-        </div>
-
-
-        <div id="busQuestion" style="display: none;">
-        <h2>Bus information</h2>
-          <label>How many km did you use the bus for?</label>
-          <input type="text" name="busDistance"><br><br>
-        </div>
-
-        <div id="trainQuestion" style="display: none;">
-        <h2>Train information</h2>
-          <label>How many km did you use the train for?</label>
-          <input type="text" name="trainDistance"><br><br>
-        </div>
-
-        <div id="planeQuestion" style="display: none;">
-          <h2>Flights information</h2>
-          <div id="flightContainer">
-            <div class="flightInputs">
-              <label for="origin">Origin Airport:</label>
-              <input type="text" name="origintext" id="originInput" autocomplete="off"><br>
-              <label> Look for your origin airport in this list:</label>
-              <select name="origin[]" id="originSelect">
-              <option value="">Select an origin airport</option>
-                  {% for airport in airports %}
-                      <option value="{{ airport }}">{{ airport }}</option>
-                  {% endfor %}
-              </select><br><br><br>
-
-              <label for="destination">Destination Airport:</label>
-              <input type="text" name="destinationtext" id="destinationInput" autocomplete="off"><br>
-              <label> Look for your destination airport in this list:</label>
-              <select name="destination[]" id="destinationSelect">
-                <option value="">Select a destination airport</option>
-                  {% for airport in airports %}
-                      <option value="{{ airport }}">{{ airport }}</option>
-                  {% endfor %}
-              </select><br><br><br>
-
-              <label for="cabin_class">Cabin Class:</label>
-              <select name="cabin_class[]" id="cabin_class">
-                  <option value="economy">Economy</option>
-                  <option value="premium_economy">Premium Economy</option>
-                  <option value="business">Business</option>
-                  <option value="first">First</option>
-              </select><br><br><br>
-
-              <label for="round_trip">Is it a round trip?</label>
-              <select name="round_trip[]" id="roundTripCheckbox">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select><br><br><br>
-              
-            </div>
+      <section id="dates">
+        <div id="Dates" class="container reveal">
+          <h1>Date Range Selection</h1>
+          <label><input type="radio" name="date-range" value="last-week" onclick="showCalendars()" required>Last Week</label>
+          <br>
+          <label><input type="radio" name="date-range" value="last-month" onclick="showCalendars()">Last Month</label>
+          <br>
+          <label><input type="radio" name="date-range" value="last-year" onclick="showCalendars()">Last Year</label>
+          <br>
+          <label><input type="radio" name="date-range" value="range-dates" id="select-dates" onclick="showCalendars()">Select Dates</label>
+          <br>
+          <div class="calendar" style="display: none;">
+              <label for="start-date">Start Date:</label>
+              <input type="date" id="start-date" name="start-date">
+              <br>
+              <label for="end-date">End Date:</label>
+              <input type="date" id="end-date" name="end-date">
           </div>
-          <button type="button" class="buttonblue" onclick="addFlightInput()" id="addFlightButton">Add Flight</button>
-
         </div>
-      </div>
+      </section>
       
+      <section id="food">
+        <div id="Food" class="container reveal">
+          <h1>Food</h1>
+          <label>What kind of diet do you follow?</label><br>
+          <label><input type="radio" name="diet" value="Vegan" required> Vegan </label><br>
+          <label><input type="radio" name="diet" value="Vegetarian"> Vegetarian </label><br>
+          <label><input type="radio" name="diet" value="Pescetarian"> Pescetarian </label><br>
+          <label><input type="radio" name="diet" value="Some_meat"> Some meat (< 50 g/day) </label><br>
+          <label><input type="radio" name="diet" value="Regular_meat"> Regular meat (50-100 g/day) </label><br>
+          <label><input type="radio" name="diet" value="Heavy_meat"> Heavy meat (> 100 g/day) </label><br><br><br>
+
+          <label>What percentage of the food have you wasted?</label><br>
+          <input type="text" name="wastedFoodPercentage" class="percentage-input" required><br><br><br>
+
+          <label>Do you mostly buy local food?</label><br>
+          <label><input type="radio" name="localFood" value="yes" required> Yes </label><br>
+          <label><input type="radio" name="localFood" value="no"> No </label><br><br><br>
+        </div>
+      </section>
+
+      <section id="transportation">
+        <div id="Transportation" class="container reveal">
+          <h1>Tranportation</h1>
+          <label>What means of transportation have you used?</label><br>
+          <label><input type="checkbox" name="meansOfTransportation[]" value="Car"> Car</label><br>
+          <label><input type="checkbox" name="meansOfTransportation[]" value="Motorbke"> Motorbike (need to find data?)</label><br>
+          <label><input type="checkbox" name="meansOfTransportation[]" value="Bus"> Bus</label><br>
+          <label><input type="checkbox" name="meansOfTransportation[]" value="Train"> Train</label><br>
+          <label><input type="checkbox" name="meansOfTransportation[]" value="Plane"> Plane</label><br><br>
 
 
-      <div id="Housing">
-        <h1>Housing</h1>
-        <label>(To Do) Housing</label><br>
-        <label><input type="radio" name="question3" value="1"> 1</label><br>
-        <label><input type="radio" name="question3" value="2"> 2</label><br>
-        <label><input type="radio" name="question3" value="3"> 3</label><br><br>
-      </div>
+          <div id="carQuestion" style="display: none;">
+          <h2>Car information</h2>
+            <label>What kind of energy source does your car use?</label><br>
+            <label><input type="radio" name="carType" value="Gasoline">Gasoline</label><br>
+            <label><input type="radio" name="carType" value="Diesel">Diesel</label><br>
+            <label><input type="radio" name="carType" value="Plug-in Hybrid Electric">Plug-in Hybrid Electric</label><br>
+            <label><input type="radio" name="carType" value="Electric">Electric</label><br>
+            <label><input type="radio" name="carType" value="I don't know">I don't know</label><br><br>
+
+            <label>How many hours have you spent driving the car?</label><br>
+            <input type="text" name="carTime"><br><br>
+          </div>
 
 
-      <div id="Consumption">
-        <h1>Consumption</h1>
-        <label>Considering clothing, shoes, electronics, furniture and other items, how much do you purchase brand-new?</label><br>
-        <label><input type="radio" name="shoppingProfile" value="lowShoppingProfile" required>None or just a few in the last year</label><br>
-        <label><input type="radio" name="shoppingProfile" value="averageShoppingProfile">Every now and then</label><br>
-        <label><input type="radio" name="shoppingProfile" value="highShoppingProfile">Multiple every month, or multiple larger products in the last year</label><br><br>
+          <div id="busQuestion" style="display: none;">
+          <h2>Bus information</h2>
+            <label>How many hours have you spent in a city bus?</label>
+            <input type="text" name="cityBusTime"><br><br><br>
 
-        <label>Have you bought a smartphone and/or a laptop/computer?</label><br>
-        <label><input type="radio" name="phoneLaptopQuestion" value="phoneAndLaptop" required>Phone and laptop/computer</label><br>
-        <label><input type="radio" name="phoneLaptopQuestion" value="phone">Phone</label><br>
-        <label><input type="radio" name="phoneLaptopQuestion" value="Laptop">Laptop/Computer</label><br>
-        <label><input type="radio" name="phoneLaptopQuestion" value="None">None of them</label><br><br>
-      </div>
+            <label>How many hours have you spent in an intercity bus?</label>
+            <input type="text" name="intercityBusTime"><br><br><br>
+          </div>
+
+          <div id="trainQuestion" style="display: none;">
+          <h2>Train information</h2>
+            <label>How many hours have you spent in the train?</label>
+            <input type="text" name="trainTime"><br><br>
+          </div>
+
+          <div id="planeQuestion" style="display: none;">
+            <h2>Flights information</h2>
+            <div id="flightContainer">
+              <div class="flightInputs">
+                <label for="origin">Origin Airport:</label>
+                <input type="text" name="origintext" id="originInput" autocomplete="off"><br>
+                <label> Look for your origin airport in this list:</label>
+                <select name="origin[]" id="originSelect">
+                <option value="">Select an origin airport</option>
+                    {% for airport in airports %}
+                        <option value="{{ airport }}">{{ airport }}</option>
+                    {% endfor %}
+                </select><br><br><br>
+
+                <label for="destination">Destination Airport:</label>
+                <input type="text" name="destinationtext" id="destinationInput" autocomplete="off"><br>
+                <label> Look for your destination airport in this list:</label>
+                <select name="destination[]" id="destinationSelect">
+                  <option value="">Select a destination airport</option>
+                    {% for airport in airports %}
+                        <option value="{{ airport }}">{{ airport }}</option>
+                    {% endfor %}
+                </select><br><br><br>
+
+                <label for="cabin_class">Cabin Class:</label>
+                <select name="cabin_class[]" id="cabin_class">
+                    <option value="economy">Economy</option>
+                    <option value="premium_economy">Premium Economy</option>
+                    <option value="business">Business</option>
+                    <option value="first">First</option>
+                </select><br><br><br>
+
+                <label for="round_trip">Is it a round trip?</label>
+                <select name="round_trip[]" id="roundTripCheckbox">
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select><br><br><br>
+                
+              </div>
+            </div>
+            <button type="button" class="buttonblue" onclick="addFlightInput()" id="addFlightButton">Add Flight</button>
+
+          </div>
+        </div>
+      </section>
+
+      <section id="housing">
+        <div id="Housing" class="container reveal">
+          <h1>Housing</h1>
+          <label>How many people live in your household (you included)?</label><br>
+          <label><input type="radio" name="howManyPeople" value="1" include> 1</label><br>
+          <label><input type="radio" name="howManyPeople" value="2"> 2</label><br>
+          <label><input type="radio" name="howManyPeople" value="3"> 3</label><br>
+          <label><input type="radio" name="howManyPeople" value="4"> 4</label><br>
+          <label><input type="radio" name="howManyPeople" value="5more"> 5 or more</label><br><br>
 
 
-      <div id="Waste">
-        <h1>Waste</h1>
-        <label>Which of the following materials do you recycle?</label><br>
-        <label><input type="checkbox" name="wasteMaterials[]" value="Glass"> Glass</label><br>
-        <label><input type="checkbox" name="wasteMaterials[]" value="Plastic"> Plastic</label><br>
-        <label><input type="checkbox" name="wasteMaterials[]" value="Paper"> Paper</label><br>
-        <label><input type="checkbox" name="wasteMaterials[]" value="OrganicWaste"> Organic waste</label><br>
-      </div>
+          <label>What tipe of heating does your house use?</label><br>
+          <label><input type="radio" name="heatingType" value="electric" include> Electric</label><br>
+          <label><input type="radio" name="heatingType" value="gas_methane"> Gas methane</label><br>
+          <label><input type="radio" name="heatingType" value="heating_oil"> Heating oil</label><br>
+          <label><input type="radio" name="heatingType" value="pellet"> Pellet</label><br>
+          <label><input type="radio" name="heatingType" value="lpg"> LPG</label><br>
+          <label><input type="radio" name="heatingType" value="notKnow"> I don't know</label><br><br>
+        </div>
+      </section>
 
-      <input type="submit" value="Submit">
+      <section id="waste">
+        <div id="Waste" class="container reveal">
+          <h1>Waste</h1>
+          <label>Which of the following materials do you recycle?</label><br>
+          <label><input type="checkbox" name="wasteMaterials[]" value="Glass"> Glass</label><br>
+          <label><input type="checkbox" name="wasteMaterials[]" value="Plastic"> Plastic</label><br>
+          <label><input type="checkbox" name="wasteMaterials[]" value="Paper"> Paper and Cardboard</label><br>
+          <label><input type="checkbox" name="wasteMaterials[]" value="Aluminium"> Aluminium (cans)</label><br>
+        </div>
+      </section>
+
+      <section id="consumption">   
+        <div id="Consumption" class="container reveal">
+          <h1>Consumption</h1>
+          <label>Considering clothing, shoes, electronics, furniture and other items, how much do you purchase brand-new?</label><br>
+          <label><input type="radio" name="shoppingProfile" value="lowShoppingProfile" required>None or just a few in the last year</label><br>
+          <label><input type="radio" name="shoppingProfile" value="averageShoppingProfile">Every now and then</label><br>
+          <label><input type="radio" name="shoppingProfile" value="highShoppingProfile">Multiple every month, or multiple larger products in the last year</label><br><br><br>
+
+          <label>Have you bought a smartphone and/or a laptop/computer?</label><br>
+          <label><input type="checkbox" name="phoneLaptopQuestion[]" value="phone">Phone</label><br>
+          <label><input type="checkbox" name="phoneLaptopQuestion[]" value="refurbishedphone">Refurbished phone</label><br>
+          <label><input type="checkbox" name="phoneLaptopQuestion[]" value="laptop">Laptop/Computer</label><br>
+          <label><input type="checkbox" name="phoneLaptopQuestion[]" value="refurbhisedLaptop">Refurbished laptop/computer</label><br><br><br>
+        
+          <input type="submit" value="Submit">
+        </div>
+      </section>   
+
+      
       <a href="/dashboard" class="button">Back to Dashboard</a>
     </form>
   </div>
@@ -429,6 +465,48 @@
         }
       }
     }
+  
+    let section = document.querySelectorAll("section");
+let menu = document.querySelectorAll("header nav a");
+
+window.onscroll = () => {
+  section.forEach((i) => {
+    let top = window.scrollY;
+    let offset = i.offsetTop - 150;
+    let height = i.offsetHeight;
+    let id = i.getAttribute("id");
+
+    if (top >= offset && top < offset + height) {
+      menu.forEach((link) => {
+        link.classList.remove("active");
+        document
+          .querySelector("header nav a[href*=" + id + "]")
+          .classList.add("active");
+      });
+    }
+  });
+};
+
+function reveal() {
+  var reveals = document.querySelectorAll(".reveal");
+
+  for (var i = 0; i < reveals.length; i++) {
+    var windowHeight = window.innerHeight;
+    var elementTop = reveals[i].getBoundingClientRect().top;
+    var elementVisible = 150;
+
+    if (elementTop < windowHeight - elementVisible) {
+      reveals[i].classList.add("active");
+    } else {
+      reveals[i].classList.remove("active");
+    }
+  }
+}
+
+window.addEventListener("scroll", reveal);
+
+// To check the scroll position on page load
+reveal();
   </script>
   </body>
 </html>

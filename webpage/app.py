@@ -13,15 +13,27 @@ from classes.graphcreator import graphCreator
 from classes.mongodbmanager import MongoDBManager
 import psycopg2
 from psycopg2 import sql
+from pyspark.sql.functions import col
+from pyspark.sql import SparkSession
+import plotly.graph_objects as go
+import pyspark.sql.functions as F
 
 from classes.postgresqlmanager import PostgreSQLManager
 from classes.redismanager import RedisManager
+from classes.sparkmanager import SparkManager
 
 session_cookie_path = './session_cookie'
 if os.path.exists(session_cookie_path):
     os.remove('flask_session')
 
 app = Flask(__name__, template_folder='./html_files')
+
+spark = SparkSession.builder \
+            .master("local") \
+            .appName("CarbonFootprintCalculator") \
+            .config("spark.driver.extraClassPath", "./drivers/postgresql_42.6.0.jar") \
+            .config("spark.jars", "./drivers/postgresql_42.6.0.jar") \
+            .getOrCreate()
 
 # Set the location of the session cookie file to a temporary directory
 app.config['SESSION_FILE_DIR'] = './'
@@ -102,8 +114,6 @@ def input_data():
     airport_names = airportManager.list_airport_names()
 
     if request.method == 'POST':
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
-
         date_range_type = request.form.get('date-range')
         start_date = request.form.get('start-date')
         end_date = request.form.get('end-date')
@@ -122,37 +132,35 @@ def input_data():
         response_data = {
             'start_date': start_date,
             'end_date': end_date,
-            'number_of_days': number_of_days,
+            'number_of_days': int(number_of_days),
+
             'answerDiet': request.form['diet'],
+            'answerWasteFoodPercentage': int(request.form['wastedFoodPercentage']),
+            'answerLocalFood': request.form['localFood'],
+
             'answerCarType': request.form.get('carType', ''),
-            'answerCarDistance': request.form['carDistance'],
-            'answerBusDistance': request.form['busDistance'],
-            'answerTrainDistance': request.form['trainDistance'],
+            'answerCarTime': int(request.form['carTime']) if request.form['carTime'].isdigit() else 0,
+            'answerCityBusTime': int(request.form['cityBusTime']) if request.form['cityBusTime'].isdigit() else 0,
+            'answerInterCityBusTime': int(request.form['intercityBusTime']) if request.form['intercityBusTime'].isdigit() else 0,
+            'answerTrainTime': int(request.form['trainTime']) if request.form['trainTime'].isdigit() else 0,
             'origin_airports': request.form.getlist('origin[]'),
             'destination_airports': request.form.getlist('destination[]'),
             'cabin_classes': request.form.getlist('cabin_class[]'),
             'round_trips': request.form.getlist('round_trip[]'),
+
+            'answerHowManyPeople': request.form['howManyPeople'],
+            'anwerHeatingType': request.form['heatingType'],
+
+            'anwerWasteMaterials': request.form.getlist('wasteMaterials[]'),
+
             'answerShoppingProfile': request.form['shoppingProfile'],
-            'answerPhoneLaptop': request.form['phoneLaptopQuestion'],
+            'answerPhoneLaptop': request.form.getlist('phoneLaptopQuestion[]'),
         }
 
-        print("RESPONSE DATA: ", response_data)
-
-        carbon_footprint_manager = footprintCalculator(response_data)
-        carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
-        print("CARBON FOOTPRINT: ", carbon_footprint)
+        print("RESPONSE DATA: ")
+        print(response_data)
 
         
-        
-        # TODO housing
-        
-    
-
-        answerWasteMaterials = request.form.getlist('wasteMaterials[]')
-        print("answerWasteMaterials ", answerWasteMaterials)
-
-        '''
-        total = int(answer1) + int(answer2) + int(answer3) + int(answer4)
 
         postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
         #  postgresql_manager = PostgreSQLManager('postgres','5432','postgres','password','mydatabase')
@@ -160,40 +168,133 @@ def input_data():
         # Retrieve the username from the Flask session
         username = session['username']
         
-        # Create a table name based on the username
-        table_name = f'user_{username}'
+        # SAVE ANSWERS
+        table_name_answers = f'user_{username}_answers'
+        
         columns = [
-            'datetime DATE',
-            'question1 INTEGER',
-            'question2 INTEGER',
-            'question3 INTEGER',
-            'question4 INTEGER',
-            'total INTEGER',
+            'start_date DATE',
+            'end_date DATE',
+            'number_of_days INTEGER',
+
+            'answerDiet VARCHAR(255)',
+            'answerWasteFoodPercentage INTEGER',
+            'answerLocalFood VARCHAR(255)',
+
+            'answerCarType VARCHAR(255)',
+            'answerCarTime INTEGER',
+            'answerCityBusTime INTEGER',
+            'answerInterCityBusTime INTEGER',
+            'answerTrainTime INTEGER',
+            'origin_airports VARCHAR(255)[]',
+            'destination_airports VARCHAR(255)[]',
+            'cabin_classes VARCHAR(255)[]',
+            'round_trips VARCHAR(255)[]',
+
+            'answerHowManyPeople VARCHAR(255)',
+            'anwerHeatingType VARCHAR(255)',
+
+            'anwerWasteMaterials VARCHAR(255)[]',
+
+            'answerShoppingProfile VARCHAR(255)',
+            'answerPhoneLaptop VARCHAR(255)[]'
         ]
-
-        # Create table if doesn't exist
-        postgresql_manager.create_table(table_name, columns)
         
-        # Input data to created table
-        input_data_columns = ['datetime', 'question1', 'question2', 'question3', 'question4', 'total']
-        input_data_values = [current_time, answer1, answer2, answer3, answer4, total]
+        postgresql_manager.create_table(table_name_answers, columns)
+        postgresql_manager.insert_data(table_name_answers, response_data)
 
-        postgresql_manager.insert_data(table_name, input_data_columns, input_data_values)
+
+        # SAVE CARBON FOOTPRINT
+        carbon_footprint_manager = footprintCalculator(response_data)
+        carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
+        print("CARBON FOOTPRINT: ")
+        print(carbon_footprint)
+
+        table_name_carbon = f'user_{username}_carbon_footprint'
+        columns_cf = [
+            'start_date DATE',
+            'end_date DATE',
+            'diet FLOAT',  
+            'transportation FLOAT',
+            'car FLOAT',
+            'bustrain FLOAT',
+            'plane FLOAT',
+            'housing FLOAT',
+            'consumption FLOAT',
+            'waste FLOAT',
+            'total FLOAT'
+        ]
+        postgresql_manager.create_table(table_name_carbon, columns_cf)
+
+        postgresql_manager.insert_data(table_name_carbon,carbon_footprint)
         
+        print("ANSWERS DATA: ")
+        print(postgresql_manager.get_all_data(table_name_answers))
+
+        print("CARBON FOOTPRINT DATA: ")
+        print(postgresql_manager.get_all_data(table_name_carbon))
+        
+        postgresql_manager.close_connection()
+
         return redirect('/track')
-        '''
+        
     return render_template('input.html', airports=airport_names)
 
 @app.route('/track', methods=['GET', 'POST'])
 def track_data():
     if 'username' not in session: 
         return redirect('/logout')
+    
     error = None
     graph_data = None
     username = session['username']
+    table_name_carbon = f'user_{username}_carbon_footprint'
     redis_manager = RedisManager('localhost', 6379, 0)
     postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
 
+    spark_manager = SparkManager(spark)
+    if request.method == 'POST':
+        from_date = request.form.get('fromDate')
+        to_date = request.form.get('toDate')
+        key = str(username) + str(from_date) + str(to_date)
+        if from_date > to_date:
+            error = "Watch out, the start date is later than the end date!"
+        else: 
+            if (redis_manager.key_exists_boolean(key)):
+                graph_data = redis_manager.get_value_by_key(key)
+                return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+            else: 
+                df = spark_manager.loadDF_with_tablename_and_dates(table_name_carbon, from_date, to_date)
+                print("JEJE")
+                print(df.show())
+
+                if df:
+                    pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
+                    # Calculate the sum of each column for each pie_label
+                    sum_values = [F.sum(col).alias(label) for label, col in zip(pie_labels, pie_labels)]
+                    result = df.agg(*sum_values)
+
+                    pie_variable_values = list(result.first().asDict().values())
+
+                    print("values: ", pie_variable_values)
+
+                    piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values)])
+
+                    # Convert the figure to a JSON string
+                    pie_graph_data = piefig.to_json()
+
+                    # TODO, store json as a string
+
+                    # Pass the graph data to the HTML template
+                    return render_template('track.html', pie_graph_data=pie_graph_data, error=error, from_date=from_date, to_date=to_date)
+                
+
+                else:
+                    error = "No data available for this range of dates"
+
+    from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
+    print(df.show())
+
+    '''
     if request.method == 'POST':
         from_date = request.form.get('fromDate')
         to_date = request.form.get('toDate')
@@ -225,35 +326,50 @@ def track_data():
                                            to_date = to_date)
                 else:
                     error = "No data available for this range of dates"
-
+    
     # Get the data for the current user from the database
-    user_data = postgresql_manager.get_all_data(f'user_{username}')
+    if df.count() > 0:
+        from_date = df.selectExpr('min(start_date) as min_date').first()['min_date']
+        to_date = df.selectExpr('max(end_date) as max_date').first()['max_date']
 
-    if user_data:
-        df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
-        
-        from_date = df['datetime'].min()
-        to_date = df['datetime'].max()
-        
         key = str(username) + str(from_date) + str(to_date)
 
-        if (redis_manager.key_exists_boolean(key)):
+        if redis_manager.key_exists_boolean(key):
             graph_data = redis_manager.get_value_by_key(key)
-            return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', 
-                                   error=error,
-                                   from_date = from_date,
-                                   to_date = to_date)
+            return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}',
+                                error=error,
+                                from_date=from_date,
+                                to_date=to_date)
         else:
-            dates = sorted(list(set(df['datetime'])))
-            date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
-
+            dates = sorted(list(set(df.select(col('start_date')).collect())))
+            date_data = {date[0]: {'diet': [], 'transportation': [], 'car': [], 'bustrain': [], 'plane': [], 'housing': [], 'consumption': [], 'waste': [], 'total': []} for date in dates}
+            
             graph_manager = graphCreator(df, dates, date_data)
             graph_data = graph_manager.create_tracking_graphs()
             redis_manager.set_key_value(key, graph_data)
     else:
         error = "No data available for this user"
+    '''
 
-    return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
+    pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
+    # Calculate the sum of each column for each pie_label
+    sum_values = [F.sum(col).alias(label) for label, col in zip(pie_labels, pie_labels)]
+    result = df.agg(*sum_values)
+
+    # Retrieve the sum values
+    pie_variable_values = list(result.first().asDict().values())
+
+    print("values: ", pie_variable_values)
+
+    piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values)])
+
+    # Convert the figure to a JSON string
+    pie_graph_data = piefig.to_json()
+
+    # TODO, store json as a string
+
+    # Pass the graph data to the HTML template
+    return render_template('track.html', pie_graph_data=pie_graph_data, error=error, from_date=from_date, to_date=to_date)
 
 # Recommendations page
 @app.route('/recommend')
