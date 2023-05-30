@@ -394,53 +394,7 @@ def track_data():
     x = [annual_average_in_tons, country_average, global_average, global_objective]
     y = ["annual_average_in_tons", "country_average", "global_average", "global_objective"]
 
-    horizontal_bar_fig = go.Figure()
-
-    horizontal_bar_fig.add_trace(go.Bar(
-        x=x,
-        y=y,
-        marker=dict(
-            color='rgba(50, 171, 96, 0.6)',
-            line=dict(
-                color='rgba(50, 171, 96, 1.0)',
-                width=1),
-        ),
-        name='CO2 emissions 1',
-        orientation='h',
-    ))
-
-    horizontal_bar_fig.update_layout(
-        title='CO2 emissions 2',
-        yaxis=dict(
-            showgrid=False,
-            showline=False,
-            showticklabels=True,
-        ),
-        xaxis=dict(
-            zeroline=False,
-            showline=False,
-            showticklabels=True,
-            showgrid=True,
-        ),
-        legend=dict(
-            x=0.029,
-            y=1.038,
-            font_size=10
-        ),
-        margin=dict(l=100, r=20, t=70, b=70),
-        paper_bgcolor='rgb(248, 248, 255)',
-        plot_bgcolor='rgb(248, 248, 255)',
-    )
-
-    """
-    horizontal_bar_fig = go.Figure(go.Bar(
-        x = x,
-        y = y,
-        orientation='h'
-    ))
-    """
-
-    horizontal_bar_data = horizontal_bar_fig.to_json()
+    horizontal_bar_data = graph_creator.create_horizontal_bars(x,y)
 
     # Pass the graph data to the HTML template
     return render_template('track.html', pie_graph_data=pie_graph_data, 

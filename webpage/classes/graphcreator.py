@@ -33,5 +33,45 @@ class graphCreator:
         pie_graph_data = piefig.to_json()
         return pie_graph_data
     
-    def create_horizontal_bars(self):
-        pass
+    def create_horizontal_bars(self,x,y):
+        horizontal_bar_fig = go.Figure()
+
+        horizontal_bar_fig.add_trace(go.Bar(
+            x=x,
+            y=y,
+            marker=dict(
+                color='rgba(50, 171, 96, 0.6)',
+                line=dict(
+                    color='rgba(50, 171, 96, 1.0)',
+                    width=1),
+            ),
+            name='CO2 emissions 1',
+            orientation='h',
+        ))
+
+        horizontal_bar_fig.update_layout(
+            title='CO2 emissions 2',
+            yaxis=dict(
+                showgrid=False,
+                showline=False,
+                showticklabels=True,
+            ),
+            xaxis=dict(
+                zeroline=False,
+                showline=False,
+                showticklabels=True,
+                showgrid=True,
+            ),
+            legend=dict(
+                x=0.029,
+                y=1.038,
+                font_size=10
+            ),
+            margin=dict(l=100, r=20, t=70, b=70),
+            paper_bgcolor='rgb(248, 248, 255)',
+            plot_bgcolor='rgb(248, 248, 255)',
+        )
+
+
+        horizontal_bar_data = horizontal_bar_fig.to_json()
+        return horizontal_bar_data
