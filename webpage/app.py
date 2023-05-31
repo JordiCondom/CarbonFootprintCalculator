@@ -20,6 +20,7 @@ from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
 import plotly.graph_objects as go
 import pyspark.sql.functions as F
+import plotly.express as px
 
 from classes.postgresqlmanager import PostgreSQLManager
 from classes.redismanager import RedisManager
@@ -404,23 +405,38 @@ def track_data():
     total_sum = df.select(F.sum("total")).first()[0]
     global annual_average_in_tons
     annual_average_in_tons = (total_sum/number_of_days)*(365/1000)
-    """
-    country_average = 0.2
-    global_average = 4.5
-    global_objective = 0.5
+
+    # ---------------------------------------------------------------------------------------------------------------------
+    # Data tracking by time
+    # Convert the 'start_date' column to datetime and 'total' column to float
+
+    # Create a histogram plot
+    df = df.withColumn('start_date', F.to_date('start_date'))
+    df = df.withColumn('total', df['total'].cast('float'))
+
+    # Convert the Spark DataFrame to a Pandas DataFrame
+    pandas_df = df.toPandas()
+
+    print('x ', pandas_df['start_date'])
+    print('y ', pandas_df['total'])
+
+    # Create a histogram plot
+    time_fig = go.Figure(data=[go.Histogram(x=pandas_df['start_date'], y=pandas_df['total'])])
+
+    time_fig = px.histogram(pandas_df, x="start_date", y="total", histfunc="avg", title="Histogram on Date Axes")
+    time_fig.update_traces(xbins_size="604800000.0")  # Set xbins_size to represent one week in milliseconds
+    time_fig.update_xaxes(showgrid=True, ticklabelmode="period", dtick="604800000.0", tickformat="%b\n%Y")  # Set dtick to represent one week in milliseconds
+    time_fig.update_layout(bargap=0.1)
 
 
+    time_fig_graph_data = time_fig.to_json()
 
-    x = [annual_average_in_tons, country_average, global_average, global_objective]
-    y = ["annual_average_in_tons", "country_average", "global_average", "global_objective"]
-
-    horizontal_bar_data = graph_creator.create_horizontal_bars(x,y)
-    """
-
+    # ---------------------------------------------------------------------------------------------------------------------
     # Pass the graph data to the HTML template
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
                            error=error, from_date=from_date, to_date=to_date,
+                           time_fig_graph_data=time_fig_graph_data,
                            countries = list(co2EmissionsCountry.keys()))
 
 

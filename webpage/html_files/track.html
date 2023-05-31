@@ -76,7 +76,7 @@
 
 	<section id="data_track">
 		<div class="container reveal">
-			
+			<div id="timefig"></div>
 		</div>
 	</section>
 
@@ -107,10 +107,23 @@
 
 	// Display the pie chart
 	Plotly.newPlot('piechart', pie_data, pie_layout);
+	// ------------------------------------------------
 
 	d = {{ graphJSON | safe }};
     Plotly.newPlot('barchart', d, {});
+	// ------------------------------------------------
 
+	var timeFigData = {{ time_fig_graph_data | tojson | safe }}
+	var time_data = JSON.parse(timeFigData);
+
+	var time_layout = {
+		title: 'Time chart',
+		height: 600,
+		width: 700
+	};
+
+	Plotly.newPlot('timefig', time_data, time_layout);
+	// ------------------------------------------------
 	let section = document.querySelectorAll("section");
 	let menu = document.querySelectorAll("header nav a");
 
