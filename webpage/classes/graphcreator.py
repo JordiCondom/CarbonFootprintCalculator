@@ -15,7 +15,7 @@ class graphCreator:
 
         print("values: ", pie_variable_values)
 
-        piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values, hole=0.5, title="Tons of CO2")])
+        piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values, hole=0.5)])
 
         piefig.update_layout(
             annotations=[
@@ -26,14 +26,16 @@ class graphCreator:
                     showarrow=False,
                     font=dict(size=10)
                 )
-            ]
+            ],
+            height=500, 
+            width=700
         )   
 
         # Convert the figure to a JSON string
         pie_graph_data = piefig.to_json()
         return pie_graph_data
     
-    def create_horizontal_bars(self,x,y):
+    def create_horizontal_bars(self, x, y, country_average):
         horizontal_bar_fig = go.Figure()
 
         horizontal_bar_fig.add_trace(go.Bar(
@@ -50,7 +52,7 @@ class graphCreator:
         ))
 
         horizontal_bar_fig.update_layout(
-            title='CO2 emissions 2',
+            title='CO2 emissions by country',
             yaxis=dict(
                 showgrid=False,
                 showline=False,
@@ -72,6 +74,12 @@ class graphCreator:
             plot_bgcolor='rgb(248, 248, 255)',
         )
 
+        # Update the country average value in the figure
+        '''
+        y_list = list(horizontal_bar_fig['data'][0]['y'])
+        y_list[1] = country_average
+        horizontal_bar_fig['data'][0]['y'] = tuple(y_list)
+        '''
 
         horizontal_bar_data = horizontal_bar_fig.to_json()
         return horizontal_bar_data

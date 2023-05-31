@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 import os
 from datetime import datetime
 import time
@@ -7,6 +8,7 @@ from flask import Flask, redirect, render_template, request, session, make_respo
 from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
+import plotly
 from classes.airportFootprintManager import AirportFootprintManager
 from classes.datesManager import DatesManager
 from classes.footprintcalculator import footprintCalculator
@@ -26,6 +28,11 @@ from classes.sparkmanager import SparkManager
 session_cookie_path = './session_cookie'
 if os.path.exists(session_cookie_path):
     os.remove('flask_session')
+
+with open('./co2EmissionsCountry.json', 'r') as f:
+    co2EmissionsCountry = json.load(f)
+
+annual_average_in_tons = 0
 
 app = Flask(__name__, template_folder='./html_files')
 
@@ -54,6 +61,11 @@ def index():
     else:
         session.pop('username', None)
         return redirect('/login')
+
+@app.route('/callback', methods=['POST', 'GET'])
+def cb():
+    country = request.args.get('data')
+    return gm(country)
 
 # Login page
 @app.route('/login', methods=['GET', 'POST'])
@@ -299,7 +311,8 @@ def track_data():
                     # Pass the graph data to the HTML template
                     return render_template('track.html', pie_graph_data=pie_graph_data, 
                                            horizontal_bar_data=horizontal_bar_data,
-                                           error=error, from_date=from_date, to_date=to_date)
+                                           error=error, from_date=from_date, to_date=to_date,
+                                           countries = list(co2EmissionsCountry.keys()))
                 
 
                 else:
@@ -386,20 +399,77 @@ def track_data():
     number_of_days = (max_end_date - min_start_date).days
 
     total_sum = df.select(F.sum("total")).first()[0]
+    global annual_average_in_tons
     annual_average_in_tons = (total_sum/number_of_days)*(365/1000)
+    """
     country_average = 0.2
     global_average = 4.5
     global_objective = 0.5
+
+
 
     x = [annual_average_in_tons, country_average, global_average, global_objective]
     y = ["annual_average_in_tons", "country_average", "global_average", "global_objective"]
 
     horizontal_bar_data = graph_creator.create_horizontal_bars(x,y)
+    """
 
     # Pass the graph data to the HTML template
     return render_template('track.html', pie_graph_data=pie_graph_data, 
-                           horizontal_bar_data=horizontal_bar_data,
-                           error=error, from_date=from_date, to_date=to_date)
+                           graphJSON=gm(),
+                           error=error, from_date=from_date, to_date=to_date,
+                           countries = list(co2EmissionsCountry.keys()))
+
+
+
+
+def gm(country='Spain'):
+    global_average = 4.5
+    global_objective = 0.5
+    country_values = co2EmissionsCountry
+    
+    fig = go.Figure()
+    fig.add_trace(go.Bar(y=['International', 'Country', 'User Value', 'Global Objective'],
+                         x=[global_average, country_values[country], annual_average_in_tons, global_objective],
+                         marker=dict(
+                            color='rgba(50, 171, 96, 0.6)',
+                            line=dict(
+                                color='rgba(50, 171, 96, 1.0)',
+                                width=1),
+                        ),
+                         orientation='h'))
+    
+    fig.update_layout(
+            title='CO2 comparison',
+            yaxis=dict(
+                showgrid=False,
+                showline=False,
+                showticklabels=True,
+            ),
+            xaxis=dict(
+                zeroline=False,
+                showline=False,
+                showticklabels=True,
+                showgrid=True,
+                title="Tons of CO2 per capita"
+            ),
+            legend=dict(
+                x=0.029,
+                y=1.038,
+                font_size=10
+            ),
+            margin=dict(l=100, r=20, t=70, b=70),
+            paper_bgcolor='rgb(248, 248, 255)',
+            plot_bgcolor='rgb(248, 248, 255)',
+            height=500, 
+            width=700
+        )
+
+    
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    
+    return graphJSON
+
 
 
 @app.route('/logout')

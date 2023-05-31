@@ -4,6 +4,18 @@
 	<title>Track Data</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function cb(selection) {
+            $.getJSON({
+                url: "/callback",
+                data: { 'data': selection },
+                success: function (result) {
+                    Plotly.newPlot('barchart', result, {staticPlot: true});
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 
@@ -43,14 +55,29 @@
 	<section id="data_track">
 		<div class="container reveal">
 		<p>Here's a plot of the data from {{from_date }} to {{to_date}}:</p>
-		<div id="chart"></div>
+		<div id="piechart"></div>
 		</div>
 
 		
 	</section>
 
 	<section id="data_track">
-		<div id="horizontal_bar"></div>
+		<div class="container reveal">
+		<div>
+			<select id="country-select" onchange="cb(this.value)">
+				{% for country in countries %}
+					<option value="{{ country }}">{{ country }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div id="barchart"></div>
+		</div>
+	</section>
+
+	<section id="data_track">
+		<div class="container reveal">
+			
+		</div>
 	</section>
 
 
@@ -79,19 +106,10 @@
 	};
 
 	// Display the pie chart
-	Plotly.newPlot('chart', pie_data, pie_layout);
+	Plotly.newPlot('piechart', pie_data, pie_layout);
 
-	var horizontalBarData = {{ horizontal_bar_data | tojson | safe }}
-
-	var horbar_data = JSON.parse(horizontalBarData)
-
-	var hor_layout = {
-		title: 'Horizontal Chart',
-		height: 500,
-		width: 600
-	}
-
-	Plotly.newPlot('horizontal_bar', horbar_data, hor_layout);
+	d = {{ graphJSON | safe }};
+    Plotly.newPlot('barchart', d, {});
 
 	let section = document.querySelectorAll("section");
 	let menu = document.querySelectorAll("header nav a");
