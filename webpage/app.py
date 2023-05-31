@@ -280,6 +280,7 @@ def track_data():
     graph_creator = graphCreator()
 
     spark_manager = SparkManager(spark)
+
     if request.method == 'POST':
         from_date = request.form.get('fromDate')
         to_date = request.form.get('toDate')
@@ -325,7 +326,9 @@ def track_data():
 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
     print(df.show())
+    #FILL EMPTY DATES !!!!!!
 
+    
     '''
     if request.method == 'POST':
         from_date = request.form.get('fromDate')
