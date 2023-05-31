@@ -12,15 +12,15 @@ class graphCreator:
     def create_pie_chart(self, pie_labels,pie_variable_values):
 
         total_co2 = int(sum(pie_variable_values))
-
+        pie_variable_values_in_tones = [value / 1000 for value in pie_variable_values]
         print("values: ", pie_variable_values)
 
-        piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values, hole=0.5)])
+        piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values_in_tones, hole=0.5)])
 
         piefig.update_layout(
             annotations=[
                 dict(
-                    text= str(total_co2) + "\n tons of CO2",  # The message you want to display
+                    text= str(total_co2/1000) + "\n tons of CO2",  # The message you want to display
                     x=0.5,  # X position of the annotation (0.5 means center horizontally)
                     y=0.5,  # Y position of the annotation (0.5 means center vertically)
                     showarrow=False,

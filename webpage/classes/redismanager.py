@@ -1,4 +1,5 @@
 import redis
+from datetime import datetime
 
 class RedisManager:
     def __init__(self, host, port, db):
@@ -17,24 +18,38 @@ class RedisManager:
     def key_exists_boolean(self,key):
         return self.r.exists(key)
     
-    def insert_range_dates(self, range_start, range_end, range_id):
-        self.r.zadd("date_ranges", {str(range_start): 0, str(range_end): 0})
-        self.r.hset("range_ids", str(range_start), range_id)
-        self.r.hset("range_ids", str(range_end), range_id)
+    def store_date_range(self, username, start_date, end_date):
+        # Convert dates to strings
+        print("start_date", start_date)
+        print("end_date", end_date)
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        final_str = str(start_date_str + ":" + end_date_str)
+        print(type(username))
+        print(type(final_str))
+        # Store the date range in Redis as a field in the Hash
+        self.r.hset(username, final_str, end_date_str)
 
-    def get_all_date_ranges(self):
-        date_ranges = self.r.zrange("date_ranges", 0, -1, withscores=True)
-        return date_ranges
+    def delete_date_range(self, username, start_date, end_date):
+        # Convert dates to strings
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
 
-    def get_all_range_ids(self):
-        range_ids = self.r.hgetall("range_ids")
-        return range_ids
-    
-    def dates_overlap(self, range_start, range_end):
-        print("DATE RANGES: ", self.get_all_date_ranges())
-        print("DATE IDS: ", self.get_all_range_ids())
-        print("RANGE START: ", range_start)
-        print("RANGE END:", range_end)
-        overlapping_ranges = self.r.zrangebyscore("date_ranges", min=str(range_start), max=str(range_end))
-        print("OVERLAPPING RANGES: ", overlapping_ranges)
-        return overlapping_ranges
+        # Delete the date range for the given username
+        self.r.hdel(username, f'{start_date_str}:{end_date_str}')
+
+    def check_date_overlap(self, username, new_start_date, new_end_date):
+    # Convert dates to strings
+        # Get all fields (date ranges) for the specified username
+        date_ranges = self.r.hgetall(username)
+
+        for range_str, score in date_ranges.items():
+            range_start_str, range_end_str = map(str, range_str.decode().split(':'))
+            # Convert range dates to datetime objects
+            range_start = datetime.strptime(range_start_str, '%Y-%m-%d').date()
+            range_end = datetime.strptime(range_end_str, '%Y-%m-%d').date()
+            # Check for overlap
+            if range_start <= new_end_date and new_start_date <= range_end:
+                return [True, range_start, range_end]
+
+        return [False, new_start_date, new_end_date]

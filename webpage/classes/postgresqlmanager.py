@@ -83,8 +83,22 @@ class PostgreSQLManager:
 
             data = cursor.fetchall()
             return data
+        
 
-    def delete_table_data(self, table_name):
+    def delete_table_sample_by_dates(self, table_name, start_date, end_date):
+        with self.conn.cursor() as cursor:
+            delete_query = sql.SQL("""
+                DELETE FROM {table_name}
+                WHERE start_date = {start} AND end_date = {end}
+            """).format(
+                table_name=sql.Identifier(table_name),
+                start=sql.Literal(start_date),
+                end=sql.Literal(end_date)
+            )
+            cursor.execute(delete_query)
+        self.conn.commit()
+
+    def delete_all_table_data(self, table_name):
         with self.conn.cursor() as cursor:
             delete_query = sql.SQL("""
                 DELETE FROM {table_name}

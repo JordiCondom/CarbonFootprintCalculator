@@ -145,24 +145,21 @@ def input_data():
         print("START DATE: ", start_date)
         print("END DATE: ", end_date)
         print("NUMBER OF DAYS: ", number_of_days)
-
-       # Example usage
-
-        # Convert start_date and end_date to range_start and range_end as timestamps
-        range_start = time.mktime(start_date.timetuple())
-        range_end = time.mktime(end_date.timetuple())
-
-        overlapping_ranges = redis_manager.dates_overlap(range_start, range_end)
-        if overlapping_ranges:
-            for overlapping_range in overlapping_ranges:
-                range_id = redis_manager.get_value_by_key(overlapping_range.decode())
-                error = f"New range of dates overlaps with existing range {range_id}"
-                # Handle the error message
-        else:
-            # Insert the range into Redis since there are no overlapping ranges
-            range_id = str(username) + str(start_date) + str(end_date)
-            redis_manager.insert_range_dates(range_start, range_end, range_id)
-            
+        
+        old_start_date = None
+        old_end_date = None
+        dates_overlap = redis_manager.check_date_overlap(username, start_date, end_date)
+        if dates_overlap[0]:
+            print("DATES OVERLAP")
+            old_start_date = dates_overlap[1]
+            old_end_date = dates_overlap[2]
+            redis_manager.delete_date_range(username, dates_overlap[1], dates_overlap[2])
+        
+        print("DATES DO NOT OVERLAP")
+        redis_manager.store_date_range(username, start_date, end_date)
+        # 1 check if date exists in a range 
+        # If exists -> Put an error message and say that in case it exists it will replace the one that is already there
+        # If not exists -> All ok, save the range of dates and proceed with the questionnaire
             
         
         response_data = {
@@ -256,6 +253,12 @@ def input_data():
 
         postgresql_manager.insert_data(table_name_carbon,carbon_footprint)
         
+        if dates_overlap[0]:
+            postgresql_manager.delete_table_sample_by_dates(table_name_carbon, old_start_date, old_end_date)
+
+
+        print(postgresql_manager.get_all_data(table_name_carbon))
+
         postgresql_manager.close_connection()
 
         return redirect('/track')
@@ -420,6 +423,18 @@ def track_data():
                            error=error, from_date=from_date, to_date=to_date,
                            countries = list(co2EmissionsCountry.keys()))
 
+
+@app.route('/deleteUserData', methods=['GET', 'POST'])
+def delete_user_date():
+    username = session['username']
+    table_name_answers = f'user_{username}_answers'
+    table_name_carbon = f'user_{username}_carbon_footprint'
+    postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
+    postgresql_manager.delete_all_table_data(table_name_answers)
+    postgresql_manager.delete_all_table_data(table_name_carbon)
+    postgresql_manager.close_connection()
+
+    return render_template('dashboard.html', username=session['username'])
 
 
 
