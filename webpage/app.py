@@ -371,10 +371,6 @@ def track_data():
             new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
             empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
 
-
-    
-
-
     # Sort the DataFrame by start_date
     new_df = empty_df.orderBy("start_date")
     new_df = new_df.filter(col("start_date") < col("end_date"))
@@ -492,7 +488,7 @@ def track_data():
         error = "No data available for this user"
     '''
     # ---------------------------------------------------------------------------------------------------------------------
-    # PIE CHART
+    # PIE CHART TOTAL
     pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
     # Calculate the sum of each column for each pie_label
     sum_values = [F.sum(col).alias(label) for label, col in zip(pie_labels, pie_labels)]
@@ -502,7 +498,7 @@ def track_data():
     pie_variable_values = list(result.first().asDict().values())
     
     pie_graph_data = graph_creator.create_pie_chart(pie_labels, pie_variable_values)
-
+    
     # ---------------------------------------------------------------------------------------------------------------------
     # Horizontal bars
 
@@ -520,20 +516,32 @@ def track_data():
     # Convert the 'start_date' column to datetime and 'total' column to float
 
     # Create a histogram plot
+    """
     df = df.withColumn('start_date', F.to_date('start_date'))
     df = df.withColumn('total', df['total'].cast('float'))
 
     # Convert the Spark DataFrame to a Pandas DataFrame
     pandas_df = df.toPandas()
 
-    # Create a histogram plot
-    time_fig = go.Figure(data=[go.Histogram(x=pandas_df['start_date'], y=pandas_df['total'])])
 
-    time_fig = px.histogram(pandas_df, x="start_date", y="total", histfunc="avg", title="Histogram on Date Axes")
-    time_fig.update_traces(xbins_size="604800000.0")  # Set xbins_size to represent one week in milliseconds
-    time_fig.update_layout(bargap=0.1)
+    # Create the histogram plot using Plotly Express
+    time_fig = px.histogram(pandas_df, x="start_date", y="total", histfunc="avg", title="Histogram on Date Axes",
+                            nbins=len(pandas_df), range_x=(pandas_df['start_date'].min(), pandas_df['end_date'].max()),
+                            labels={'start_date': 'Start Date', 'total': 'Total'},
+                            category_orders={'start_date': sorted(pandas_df['start_date'].unique())},
+                            histnorm='percent')
 
+    # Set the bin sizes based on the duration of each bin
+    time_fig.update_traces(xbins=dict(start=pandas_df['start_date'], end=pandas_df['end_date']))
+    """
 
+    df_pandas = df.toPandas()
+
+    # Plotting the data
+    time_fig = px.line(df_pandas, x="end_date", y=["diet", "transportation", "housing", "consumption", "waste", "total"],
+                title='Co2 Over Time')
+
+    # Convert the figure to JSON
     time_fig_graph_data = time_fig.to_json()
 
     # ---------------------------------------------------------------------------------------------------------------------
