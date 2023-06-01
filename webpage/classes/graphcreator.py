@@ -13,7 +13,6 @@ class graphCreator:
 
         total_co2 = int(sum(pie_variable_values))
         pie_variable_values_in_tones = [value / 1000 for value in pie_variable_values]
-        print("values: ", pie_variable_values)
 
         piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values_in_tones, hole=0.5)])
 

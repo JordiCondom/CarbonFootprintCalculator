@@ -2,7 +2,7 @@ import base64
 import io
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from flask import Flask, redirect, render_template, request, session, make_response
 from matplotlib.figure import Figure
@@ -21,6 +21,10 @@ from pyspark.sql import SparkSession
 import plotly.graph_objects as go
 import pyspark.sql.functions as F
 import plotly.express as px
+from pyspark.sql.functions import col, expr, date_add, lit, min, max
+from pyspark.sql.types import DateType
+from pyspark.sql.window import Window
+from pyspark.sql.functions import lag, lead, col
 
 from classes.postgresqlmanager import PostgreSQLManager
 from classes.redismanager import RedisManager
@@ -325,7 +329,109 @@ def track_data():
 
 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
+    df = df.orderBy("start_date")
     print(df.show())
+
+    # Get the minimum and maximum start dates from the DataFrame
+    # Get the minimum and maximum start dates from the DataFrame
+    # Get the minimum and maximum start dates from the DataFrame
+    min_start_date = df.selectExpr("min(start_date)").first()[0]
+    max_start_date = df.selectExpr("max(start_date)").first()[0]
+
+    # Create an empty DataFrame with the same schema as the original DataFrame
+    empty_df = spark.createDataFrame([], schema=df.schema)
+
+    # Sort the DataFrame by start_date
+    sorted_df = df.orderBy("start_date")
+
+    # Iterate through each row in the sorted DataFrame
+    for i in range(sorted_df.count()):
+        row = sorted_df.collect()[i]
+        start_date = row.start_date
+        end_date = row.end_date
+
+        # If it's not the first row, create a row with the start date as the end date of the previous row
+        if i > 0:
+            prev_row = sorted_df.collect()[i - 1]
+            prev_end_date = prev_row.end_date
+            missing_start_date = prev_end_date + timedelta(days=1)
+            missing_end_date = start_date - timedelta(days=1)
+            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
+
+        # Append the original row to the empty DataFrame
+        empty_df = empty_df.union(spark.createDataFrame([row], schema=df.schema))
+
+        # If it's the last row, create a row with the end date as the start date of the next row
+        if i == sorted_df.count() - 1:
+            next_row = sorted_df.collect()[i]
+            next_start_date = next_row.start_date
+            missing_start_date = end_date + timedelta(days=1)
+            missing_end_date = next_start_date - timedelta(days=1)
+            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
+
+
+    
+
+
+    # Sort the DataFrame by start_date
+    new_df = empty_df.orderBy("start_date")
+    new_df = new_df.filter(col("start_date") < col("end_date"))
+    new_df = new_df.withColumn("number_of_days", (col("end_date") - col("start_date")).cast("int"))
+    new_df = new_df.withColumn("average_per_day", col("total") / col("number_of_days"))
+
+    df = new_df
+
+    # Convert DataFrame to a list of rows
+    # Convert DataFrame to a list of rows
+    rows = df.collect()
+
+    # Create a new list for updated rows
+    updated_rows = []
+
+    # Iterate over each row
+    for i in range(len(rows)):
+        current_row = rows[i]
+        prev_row = rows[i - 1] if i > 0 else None
+        next_row = rows[i + 1] if i < len(rows) - 1 else None
+        
+        # Calculate the new diet value based on the formula
+        if current_row["diet"] == 0:
+            columns_to_change = ["diet", "transportation", "car", "bustrain", "plane", "housing", "consumption", "waste", "total"]
+            updated_row = current_row.asDict()
+            for column in columns_to_change:
+                if column == "total":
+                    updated_row[column] = updated_row["diet"] + updated_row["transportation"] + updated_row["housing"] + updated_row["consumption"] + updated_row["waste"]
+                    
+                else:
+                    prev_value = prev_row[column] if prev_row else 0
+                    next_value = next_row[column] if next_row else 0
+                    prev_num_days = prev_row["number_of_days"] if prev_row else 0
+                    next_num_days = next_row["number_of_days"] if next_row else 0
+                    new_value = current_row["number_of_days"] * (prev_value + next_value) / (prev_num_days + next_num_days)
+                    
+                    # Create a new row with updated diet value
+                    updated_row[column] = new_value
+                    
+            # Append the updated row to the list
+            updated_rows.append(updated_row)
+        else:
+            # Append the original row to the list
+            updated_rows.append(current_row.asDict())
+
+    # Create a new DataFrame from the updated list of rows
+    df_filled = spark.createDataFrame(updated_rows, df.schema)
+
+    print(df_filled.show())
+    df = df_filled
+
+    
+
+
+
+
+
     #FILL EMPTY DATES !!!!!!
 
     
@@ -420,15 +526,11 @@ def track_data():
     # Convert the Spark DataFrame to a Pandas DataFrame
     pandas_df = df.toPandas()
 
-    print('x ', pandas_df['start_date'])
-    print('y ', pandas_df['total'])
-
     # Create a histogram plot
     time_fig = go.Figure(data=[go.Histogram(x=pandas_df['start_date'], y=pandas_df['total'])])
 
     time_fig = px.histogram(pandas_df, x="start_date", y="total", histfunc="avg", title="Histogram on Date Axes")
     time_fig.update_traces(xbins_size="604800000.0")  # Set xbins_size to represent one week in milliseconds
-    time_fig.update_xaxes(showgrid=True, ticklabelmode="period", dtick="604800000.0", tickformat="%b\n%Y")  # Set dtick to represent one week in milliseconds
     time_fig.update_layout(bargap=0.1)
 
 
