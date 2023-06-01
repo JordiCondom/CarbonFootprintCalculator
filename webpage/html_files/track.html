@@ -15,6 +15,43 @@
                 }
             });
         }
+		function time_cb() {
+			var dietChecked = document.querySelector('input[name="datatToPlot[]"][value="diet"]').checked;
+			var transportationChecked = document.querySelector('input[name="datatToPlot[]"][value="transportation"]').checked;
+			var housingChecked = document.querySelector('input[name="datatToPlot[]"][value="housing"]').checked;
+			var consumptionChecked = document.querySelector('input[name="datatToPlot[]"][value="consumption"]').checked;
+			var wasteChecked = document.querySelector('input[name="datatToPlot[]"][value="waste"]').checked;
+			var totalChecked = document.querySelector('input[name="datatToPlot[]"][value="total"]').checked;
+
+			// Create an array to hold the checked items
+			var checkedItems = [];
+
+			// Push the checked items to the array
+			if (dietChecked) {
+				checkedItems.push('diet');
+			}
+			if (transportationChecked) {
+				checkedItems.push('transportation');
+			}
+			if (housingChecked) {
+				checkedItems.push('housing');
+			}
+			if (consumptionChecked) {
+				checkedItems.push('consumption');
+			}
+			if (wasteChecked) {
+				checkedItems.push('waste');
+			}
+			if (totalChecked) {
+				checkedItems.push('total');
+			}
+
+            var queryString = "data=" + checkedItems.join(',');
+
+			$.getJSON("/callbackTime?" + queryString, function(result) {
+				Plotly.newPlot('timefig', result, { staticPlot: true });
+			});
+        }
     </script>
 </head>
 <body>
@@ -57,8 +94,6 @@
 		<p>Here's a plot of the data from {{from_date }} to {{to_date}}:</p>
 		<div id="piechart"></div>
 		</div>
-
-		
 	</section>
 
 	<section id="data_track">
@@ -76,9 +111,19 @@
 
 	<section id="data_track">
 		<div class="container reveal">
+			<div>
+				<label>What data do you want to plot?</label><br>
+				<label><input type="checkbox" name="datatToPlot[]" value="diet" onchange="time_cb()" checked> Diet</label><br>
+				<label><input type="checkbox" name="datatToPlot[]" value="transportation" onchange="time_cb()" checked> Transportation</label><br>
+				<label><input type="checkbox" name="datatToPlot[]" value="housing" onchange="time_cb()" checked> Housing</label><br>
+				<label><input type="checkbox" name="datatToPlot[]" value="consumption" onchange="time_cb()" checked> Consumption</label><br>
+				<label><input type="checkbox" name="datatToPlot[]" value="waste" onchange="time_cb()" checked> Waste</label><br>
+				<label><input type="checkbox" name="datatToPlot[]" value="total" onchange="time_cb()" checked> Total</label><br>
+			</div>
 			<div id="timefig"></div>
 		</div>
 	</section>
+
 
 
 

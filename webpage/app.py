@@ -38,6 +38,7 @@ with open('./co2EmissionsCountry.json', 'r') as f:
     co2EmissionsCountry = json.load(f)
 
 annual_average_in_tons = 0
+df_pandas = None
 
 app = Flask(__name__, template_folder='./html_files')
 
@@ -515,43 +516,18 @@ def track_data():
     # Data tracking by time
     # Convert the 'start_date' column to datetime and 'total' column to float
 
-    # Create a histogram plot
-    """
-    df = df.withColumn('start_date', F.to_date('start_date'))
-    df = df.withColumn('total', df['total'].cast('float'))
+    # Create a line time chart plot
 
-    # Convert the Spark DataFrame to a Pandas DataFrame
-    pandas_df = df.toPandas()
-
-
-    # Create the histogram plot using Plotly Express
-    time_fig = px.histogram(pandas_df, x="start_date", y="total", histfunc="avg", title="Histogram on Date Axes",
-                            nbins=len(pandas_df), range_x=(pandas_df['start_date'].min(), pandas_df['end_date'].max()),
-                            labels={'start_date': 'Start Date', 'total': 'Total'},
-                            category_orders={'start_date': sorted(pandas_df['start_date'].unique())},
-                            histnorm='percent')
-
-    # Set the bin sizes based on the duration of each bin
-    time_fig.update_traces(xbins=dict(start=pandas_df['start_date'], end=pandas_df['end_date']))
-    """
-
+    global df_pandas
     df_pandas = df.toPandas()
-
-    # Plotting the data
-    time_fig = px.line(df_pandas, x="end_date", y=["diet", "transportation", "housing", "consumption", "waste", "total"],
-                title='Co2 Over Time')
-
-    # Convert the figure to JSON
-    time_fig_graph_data = time_fig.to_json()
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Pass the graph data to the HTML template
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
                            error=error, from_date=from_date, to_date=to_date,
-                           time_fig_graph_data=time_fig_graph_data,
+                           time_fig_graph_data=time_graph(),
                            countries = list(co2EmissionsCountry.keys()))
-
 
 @app.route('/deleteUserData', methods=['GET', 'POST'])
 def delete_user_date():
@@ -564,6 +540,23 @@ def delete_user_date():
     postgresql_manager.close_connection()
 
     return render_template('dashboard.html', username=session['username'])
+
+@app.route('/callbackTime', methods=['POST', 'GET'])
+def callback_time():
+    data_to_show = request.args.getlist('data')
+    data_to_show = data_to_show[0].split(',')
+    return time_graph(data_to_show)
+
+def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "total"]):
+    # Plotting the data
+    fig = px.line(df_pandas, x="end_date", y=y,
+                title='Co2 Over Time')
+    
+    fig.update_layout(height=500, width=700)
+
+    timegraphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+        
+    return timegraphJSON
 
 
 
