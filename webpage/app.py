@@ -499,6 +499,19 @@ def track_data():
     pie_variable_values = list(result.first().asDict().values())
     
     pie_graph_data = graph_creator.create_pie_chart(pie_labels, pie_variable_values)
+
+    # ---------------------------------------------------------------------------------------------------------------------
+    #SUNBURST!!! 
+
+    sun_labels = ["total","diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane" ]
+    sun_parents = ["","total", "total", "total", "total", "total", "transportation", "transportation", "transportation"]
+    sun_values = [F.sum(col).alias(label) for label, col in zip(sun_labels, sun_labels)]
+    result2 = df.agg(*sun_values)
+
+    print("Arribiamo qui 3")
+
+    pie2_variable_values = list(result2.first().asDict().values())
+    sun_graph_data = graph_creator.create_sun_chart(sun_labels, sun_parents, pie2_variable_values)
     
     # ---------------------------------------------------------------------------------------------------------------------
     # Horizontal bars
@@ -525,6 +538,7 @@ def track_data():
     # Pass the graph data to the HTML template
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
+                           sun_graph_data=sun_graph_data,
                            error=error, from_date=from_date, to_date=to_date,
                            time_fig_graph_data=time_graph(),
                            countries = list(co2EmissionsCountry.keys()))

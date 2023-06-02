@@ -98,6 +98,13 @@
 
 	<section id="data_track">
 		<div class="container reveal">
+			<p>Here's a plot of the data from {{from_date }} to {{to_date}}:</p>
+			<div id="sunchart"></div>
+		</div>
+	</section>
+
+	<section id="data_track">
+		<div class="container reveal">
 		<div>
 			<select id="country-select" onchange="cb(this.value)">
 				{% for country in countries %}
@@ -152,8 +159,25 @@
 
 	// Display the pie chart
 	Plotly.newPlot('piechart', pie_data, pie_layout);
-	// ------------------------------------------------
 
+
+	// ------------------------------------------------
+	// Sun chart
+
+	var sunGraphData = {{sun_graph_data | tojson | safe }};
+
+	var sun_data = JSON.parse(sunGraphData)
+
+	var sun_layout = {
+		title:'Sn chart',
+		height: 600,
+		widtth: 700
+	};
+
+	Plotly.newPlot('sunchart', sun_data, sun_layout)
+
+	// ------------------------------------------------
+	// Bar chart
 	d = {{ graphJSON | safe }};
     Plotly.newPlot('barchart', d, {});
 	// ------------------------------------------------
