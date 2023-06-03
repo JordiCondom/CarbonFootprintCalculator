@@ -20,13 +20,9 @@ class RedisManager:
     
     def store_date_range(self, username, start_date, end_date):
         # Convert dates to strings
-        print("start_date", start_date)
-        print("end_date", end_date)
         start_date_str = start_date.strftime('%Y-%m-%d')
         end_date_str = end_date.strftime('%Y-%m-%d')
         final_str = str(start_date_str + ":" + end_date_str)
-        print(type(username))
-        print(type(final_str))
         # Store the date range in Redis as a field in the Hash
         self.r.hset(username, final_str, end_date_str)
 

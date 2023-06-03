@@ -146,22 +146,15 @@ def input_data():
         number_of_days = dates_manager.get_number_of_days()
 
         redis_manager = RedisManager('localhost', 6379, 1)
-
-
-        print("START DATE: ", start_date)
-        print("END DATE: ", end_date)
-        print("NUMBER OF DAYS: ", number_of_days)
         
         old_start_date = None
         old_end_date = None
         dates_overlap = redis_manager.check_date_overlap(username, start_date, end_date)
         if dates_overlap[0]:
-            print("DATES OVERLAP")
             old_start_date = dates_overlap[1]
             old_end_date = dates_overlap[2]
             redis_manager.delete_date_range(username, dates_overlap[1], dates_overlap[2])
         
-        print("DATES DO NOT OVERLAP")
         redis_manager.store_date_range(username, start_date, end_date)
         # 1 check if date exists in a range 
         # If exists -> Put an error message and say that in case it exists it will replace the one that is already there
@@ -174,7 +167,7 @@ def input_data():
             'number_of_days': int(number_of_days),
 
             'answerDiet': request.form['diet'],
-            'answerWasteFoodPercentage': int(request.form['wastedFoodPercentage']),
+            'answerWasteFoodPercentage': int(request.form['wastedFoodPercentage']) if request.form['wastedFoodPercentage'].isdigit() else 5,
             'answerLocalFood': request.form['localFood'],
 
             'answerCarType': request.form.get('carType', ''),
@@ -262,9 +255,6 @@ def input_data():
         if dates_overlap[0]:
             postgresql_manager.delete_table_sample_by_dates(table_name_carbon, old_start_date, old_end_date)
 
-
-        print(postgresql_manager.get_all_data(table_name_carbon))
-
         postgresql_manager.close_connection()
 
         return redirect('/track')
@@ -298,7 +288,6 @@ def track_data():
                 return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
             else: 
                 df = spark_manager.loadDF_with_tablename_and_dates(table_name_carbon, from_date, to_date)
-                print("JEJE")
                 print(df.show())
 
                 if df:
@@ -308,8 +297,6 @@ def track_data():
                     result = df.agg(*sum_values)
 
                     pie_variable_values = list(result.first().asDict().values())
-
-                    print("values: ", pie_variable_values)
 
                     piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values,hole=0.5)])
 
@@ -333,9 +320,6 @@ def track_data():
     df = df.orderBy("start_date")
     print(df.show())
 
-    # Get the minimum and maximum start dates from the DataFrame
-    # Get the minimum and maximum start dates from the DataFrame
-    # Get the minimum and maximum start dates from the DataFrame
     min_start_date = df.selectExpr("min(start_date)").first()[0]
     max_start_date = df.selectExpr("max(start_date)").first()[0]
 
@@ -381,7 +365,6 @@ def track_data():
     df = new_df
 
     # Convert DataFrame to a list of rows
-    # Convert DataFrame to a list of rows
     rows = df.collect()
 
     # Create a new list for updated rows
@@ -423,15 +406,7 @@ def track_data():
     print(df_filled.show())
     df = df_filled
 
-    
 
-
-
-
-
-    #FILL EMPTY DATES !!!!!!
-
-    
     '''
     if request.method == 'POST':
         from_date = request.form.get('fromDate')
@@ -507,8 +482,6 @@ def track_data():
     sun_parents = ["","total", "total", "total", "total", "total", "transportation", "transportation", "transportation"]
     sun_values = [F.sum(col).alias(label) for label, col in zip(sun_labels, sun_labels)]
     result2 = df.agg(*sun_values)
-
-    print("Arribiamo qui 3")
 
     pie2_variable_values = list(result2.first().asDict().values())
     sun_graph_data = graph_creator.create_sun_chart(sun_labels, sun_parents, pie2_variable_values)
