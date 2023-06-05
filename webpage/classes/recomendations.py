@@ -1,7 +1,7 @@
 def recomendations(dataframe):
     res = []
 # DIET
-    if dataframe['diet'] > 4.6:
+    if (dataframe['diet'] > 4.6)/dataframe['number_of_days']:
         temp = "With a little change in your diet you can drastically lower your carbon footprint, if you decide to reduce your consumption of meat to just one steak (350g) instead of two each week you can save 35% with respect to eating 2!"
         reduction = 0.35
     else:
@@ -36,4 +36,23 @@ def recomendations(dataframe):
     kg_reduction = dataframe['number_of_days'] * 2.5
     res.append(tuple(temp, kg_reduction))
 
+######################### WASTE IN PROGRESS #########################
+    # if dataframe['waste'] > ?
+    # temp = "Recycling glass, plastic, paper, and aluminum is highly recommended for reducing CO2 emissions. Glass recycling can result in a 41% reduction, plastic and paper recycling can achieve a 37% reduction, while aluminum recycling offers an impressive 96% reduction. These percentages represent the amount of CO2 emissions prevented when these materials are produced from raw materials. We can contribute to a greener future and reduce environmental impact by actively participating in recycling efforts. Glass recycling saves energy and lowers greenhouse gas emissions. Recycling plastic helps to reduce environmental impact and waste accumulation. Recycling paper saves trees, water, and energy. Aluminum recycling conserves energy and reduces the need for raw material extraction and processing. Let's recycle to make a positive difference for the environment."
+    # dict_reduction = {
+    #     'Plastic': 0.37,
+    #     'Glass': 0.41,
+    #     'Paper': 0.37,
+    #     'Aluminium': 0.96}
+    # res.append(tuple(temp, dict_reduction))
 
+
+    # 0 = NOT RECYCLED
+    if dataframe['wastePlastic'] == 1:
+
+    if dataframe['wasteGlass'] == 1:
+
+    if dataframe['wastePaper'] == 1:
+
+    if dataframe['wasteAluminium'] == 1:
+ 
