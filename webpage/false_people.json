@@ -1,8 +1,8 @@
 data = {
-  person1 : {
+  'user1' : {
     'start_date': ,
     'end_date': ,
-    'number_of_days': int(),
+    'number_of_days':,
     'answerDiet': ,
     'answerWasteFoodPercentage':,
     'answerLocalFood':,
@@ -11,18 +11,21 @@ data = {
     'answerCarTime':,
     'answerCityBusTime':,
 
-    'answerInterCityBusTime': int(request.form['intercityBusTime']) if request.form['intercityBusTime'].isdigit() else 0,
-    'answerTrainTime': int(request.form['trainTime']) if request.form['trainTime'].isdigit() else 0,
-    'origin_airports': request.form.getlist('origin[]'),
-    'destination_airports': request.form.getlist('destination[]'),
-    'cabin_classes': request.form.getlist('cabin_class[]'),
-    'round_trips': request.form.getlist('round_trip[]'),
+    'answerInterCityBusTime':,
+    'answerTrainTime':,
+    'origin_airports':,
+    'destination_airports':,
+    'cabin_classes':,
+    'round_trips':,
 
-    'answerHowManyPeople': request.form['howManyPeople'],
-    'anwerHeatingType': request.form['heatingType'],
+    'answerHowManyPeople':,
+    'anwerHeatingType':,
 
-    'anwerWasteMaterials': request.form.getlist('wasteMaterials[]'),
-
-    'answerShoppingProfile': request.form['shoppingProfile'],
-    'answerPhoneLaptop': request.form.getlist('phoneLaptopQuestion[]')
-}}
+    'anwerWasteMaterials':
+    'answerShoppingProfile':,
+    'answerPhoneLaptop':
+},
+  'user2' : {
+    
+  }
+:  }
