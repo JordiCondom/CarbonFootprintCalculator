@@ -117,20 +117,27 @@ class SparkManager:
             start_date, end_date = next_start_date, next_end_date
 
         columns = ['start_date', 'end_date', 'diet', 'transportation', 'car', 'bustrain', 'plane', 'housing', 'consumption', 'waste', 'number_of_days', 'average_per_day', 'total']
-        filled_dates_df = self.spark.createDataFrame(consecutive_date_pairs_filled, columns)
+        
+        if consecutive_date_pairs_filled:
+            filled_dates_df = self.spark.createDataFrame(consecutive_date_pairs_filled, columns)
 
-        num_partitions = 30
-        print('num_partitions: ', num_partitions)
-        df_partitioned = df.repartition(num_partitions, "start_date")
-        filled_dates_partitioned = filled_dates_df.repartition(num_partitions, "start_date")
+            num_partitions = 30
+            print('num_partitions: ', num_partitions)
+            df_partitioned = df.repartition(num_partitions, "start_date")
+            filled_dates_partitioned = filled_dates_df.repartition(num_partitions, "start_date")
 
-        # Join the partitioned DataFrames
-        joined_df = df_partitioned.union(filled_dates_partitioned)
+            # Join the partitioned DataFrames
+            joined_df = df_partitioned.union(filled_dates_partitioned)
 
-        # Order the rows by start_date
-        ordered_df = joined_df.orderBy(F.col('start_date'))
+            # Order the rows by start_date
+            ordered_df = joined_df.orderBy(F.col('start_date'))
 
-        print(ordered_df.show())
+            print(ordered_df.show())
 
-        return ordered_df
+            return ordered_df
+        
+        else: 
+            return df
+
+        
         
