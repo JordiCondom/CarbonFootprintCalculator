@@ -49,3 +49,15 @@ class RedisManager:
                 return [True, range_start, range_end]
 
         return [False, new_start_date, new_end_date]
+    
+
+    def delete_user_data(self, username):
+        # Get all the fields (date ranges) for the specified username
+        date_ranges = self.r.hkeys(username)
+        
+        # Delete each date range for the username
+        for date_range in date_ranges:
+            self.r.hdel(username, date_range)
+        
+        # Delete the username itself
+        self.r.delete(username)

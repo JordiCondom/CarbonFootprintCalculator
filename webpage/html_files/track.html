@@ -5,6 +5,23 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css">
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<style>
+		
+		.grid {
+			display: grid;
+			grid-gap: 10px; /* Adjust the gap between grid items as needed */
+			width: 100%;
+			height: 100%;
+		}
+
+		.message-box {
+			background-color: #bdfbc3 !important; /* Adjust the background color as needed */
+			padding: 20px; /* Adjust the padding as needed */
+			border-radius: 5px; /* Adjust the border radius as needed */
+			width: 100%; /* Make the message boxes fill the available width */
+			box-sizing: border-box; /* Include padding and border in the box width */
+		}
+	</style>
     <script>
         function cb(selection) {
             $.getJSON({
@@ -62,6 +79,7 @@
 			<a href="#dates" class="active">Dates</a>
 			<a href="#data_track">Data tracking</a>
 			<a href="#recommend">Recommendations</a>
+			<a href="#carbonoffset">Carbon offsetting</a>
 			<a href="/logout" class="logout-button">Logout</a>
 		</nav>
 	</header>
@@ -120,23 +138,37 @@
 		<div class="container reveal">
 			<div>
 				<label>What data do you want to plot?</label><br>
-				<label><input type="checkbox" name="datatToPlot[]" value="diet" onchange="time_cb()" checked> Diet</label><br>
-				<label><input type="checkbox" name="datatToPlot[]" value="transportation" onchange="time_cb()" checked> Transportation</label><br>
-				<label><input type="checkbox" name="datatToPlot[]" value="housing" onchange="time_cb()" checked> Housing</label><br>
-				<label><input type="checkbox" name="datatToPlot[]" value="consumption" onchange="time_cb()" checked> Consumption</label><br>
-				<label><input type="checkbox" name="datatToPlot[]" value="waste" onchange="time_cb()" checked> Waste</label><br>
-				<label><input type="checkbox" name="datatToPlot[]" value="total" onchange="time_cb()" checked> Total</label><br>
+				<div style="display: flex; justify-content: space-between;">
+					<div>
+					  <label><input type="checkbox" name="datatToPlot[]" value="diet" onchange="time_cb()" checked> Diet</label><br>
+					  <label><input type="checkbox" name="datatToPlot[]" value="consumption" onchange="time_cb()" checked> Consumption</label><br>
+					</div>
+					<div>
+					  <label><input type="checkbox" name="datatToPlot[]" value="transportation" onchange="time_cb()" checked> Transportation</label><br>
+					  <label><input type="checkbox" name="datatToPlot[]" value="waste" onchange="time_cb()" checked> Waste</label><br>
+					</div>
+					<div>
+					  <label><input type="checkbox" name="datatToPlot[]" value="housing" onchange="time_cb()" checked> Housing</label><br>
+					  <label><input type="checkbox" name="datatToPlot[]" value="total" onchange="time_cb()" checked> Total</label><br>
+					</div>
+				  </div>
 			</div>
 			<div id="timefig"></div>
 		</div>
 	</section>
 
-
-
-
 	<section id="recommend">
 		<div class="container reveal">
-			<p>Eat kebabs</p>
+			<div class="grid">
+				<div class="grid" id="message-grid">
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="carbonoffset">
+		<div class="container reveal">
+			<p> Just plant trees </p>
 		</div>
 	</section>
 
@@ -193,6 +225,23 @@
 
 	Plotly.newPlot('timefig', time_data, time_layout);
 	// ------------------------------------------------
+
+	var recommendations_vector = {{ recommendations_vector | tojson }};
+	console.log(recommendations_vector);
+
+	// Get the grid container element
+	let messageGrid = document.getElementById("message-grid");
+
+	// Loop through the recommendations array and create message boxes
+	recommendations_vector.forEach(recommendation => {
+	let messageBox = document.createElement("div");
+	messageBox.classList.add("message-box");
+	messageBox.innerHTML = `<p>${recommendation}</p>`;
+	messageGrid.appendChild(messageBox);
+	});
+
+	// ------------------------------------------------
+
 	let section = document.querySelectorAll("section");
 	let menu = document.querySelectorAll("header nav a");
 
@@ -215,19 +264,19 @@
 	};
 
 	function reveal() {
-	var reveals = document.querySelectorAll(".reveal");
+		var reveals = document.querySelectorAll(".reveal");
 
-	for (var i = 0; i < reveals.length; i++) {
-		var windowHeight = window.innerHeight;
-		var elementTop = reveals[i].getBoundingClientRect().top;
-		var elementVisible = 150;
+		for (var i = 0; i < reveals.length; i++) {
+			var windowHeight = window.innerHeight;
+			var elementTop = reveals[i].getBoundingClientRect().top;
+			var elementVisible = 150;
 
-		if (elementTop < windowHeight - elementVisible) {
-		reveals[i].classList.add("active");
-		} else {
-		reveals[i].classList.remove("active");
+			if (elementTop < windowHeight - elementVisible) {
+			reveals[i].classList.add("active");
+			} else {
+			reveals[i].classList.remove("active");
+			}
 		}
-	}
 	}
 
 	window.addEventListener("scroll", reveal);

@@ -246,6 +246,8 @@ def input_data():
             'housing FLOAT',
             'consumption FLOAT',
             'waste FLOAT',
+            'number_of_days FLOAT',
+            'average_per_day FLOAT',
             'total FLOAT'
         ]
         postgresql_manager.create_table(table_name_carbon, columns_cf)
@@ -317,6 +319,9 @@ def track_data():
 
 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
+    print(df.show())
+    df = spark_manager.fill_df(df)
+    '''
     df = df.orderBy("start_date")
     print(df.show())
 
@@ -327,7 +332,6 @@ def track_data():
     empty_df = spark.createDataFrame([], schema=df.schema)
 
     # Sort the DataFrame by start_date
-    sorted_df = df.orderBy("start_date")
 
     # Iterate through each row in the sorted DataFrame
     for i in range(sorted_df.count()):
@@ -341,7 +345,7 @@ def track_data():
             prev_end_date = prev_row.end_date
             missing_start_date = prev_end_date + timedelta(days=1)
             missing_end_date = start_date - timedelta(days=1)
-            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
             empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
 
         # Append the original row to the empty DataFrame
@@ -353,14 +357,12 @@ def track_data():
             next_start_date = next_row.start_date
             missing_start_date = end_date + timedelta(days=1)
             missing_end_date = next_start_date - timedelta(days=1)
-            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
             empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
 
     # Sort the DataFrame by start_date
     new_df = empty_df.orderBy("start_date")
     new_df = new_df.filter(col("start_date") < col("end_date"))
-    new_df = new_df.withColumn("number_of_days", (col("end_date") - col("start_date")).cast("int"))
-    new_df = new_df.withColumn("average_per_day", col("total") / col("number_of_days"))
 
     df = new_df
 
@@ -378,12 +380,13 @@ def track_data():
         
         # Calculate the new diet value based on the formula
         if current_row["diet"] == 0:
-            columns_to_change = ["diet", "transportation", "car", "bustrain", "plane", "housing", "consumption", "waste", "total"]
+            columns_to_change = ["diet", "car", "bustrain", "transportation","housing", "consumption", "waste", "total"]
             updated_row = current_row.asDict()
             for column in columns_to_change:
                 if column == "total":
                     updated_row[column] = updated_row["diet"] + updated_row["transportation"] + updated_row["housing"] + updated_row["consumption"] + updated_row["waste"]
-                    
+                elif column == "transportation":
+                    updated_row[column] = updated_row["car"] + updated_row["bustrain"]
                 else:
                     prev_value = prev_row[column] if prev_row else 0
                     next_value = next_row[column] if next_row else 0
@@ -405,7 +408,7 @@ def track_data():
 
     print(df_filled.show())
     df = df_filled
-
+    '''
 
     '''
     if request.method == 'POST':
@@ -508,13 +511,16 @@ def track_data():
     df_pandas = df.toPandas()
 
     # ---------------------------------------------------------------------------------------------------------------------
-    # Pass the graph data to the HTML template
+    # Recommendations
+    recommendations_vector = ["Eat less meat Eat less meat Eat less meat Eat less meat Eat less meat", "Use your car less", "Use more public transport", "Don't consume that much", "Recycle more"]
+
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
                            sun_graph_data=sun_graph_data,
                            error=error, from_date=from_date, to_date=to_date,
                            time_fig_graph_data=time_graph(),
-                           countries = list(co2EmissionsCountry.keys()))
+                           countries = list(co2EmissionsCountry.keys()),
+                           recommendations_vector=recommendations_vector)
 
 @app.route('/deleteUserData', methods=['GET', 'POST'])
 def delete_user_date():
@@ -522,6 +528,9 @@ def delete_user_date():
     table_name_answers = f'user_{username}_answers'
     table_name_carbon = f'user_{username}_carbon_footprint'
     postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
+    redis_manager = RedisManager('localhost', 6379, 1)
+
+    redis_manager.delete_user_data(username)
     postgresql_manager.delete_all_table_data(table_name_answers)
     postgresql_manager.delete_all_table_data(table_name_carbon)
     postgresql_manager.close_connection()
@@ -535,8 +544,20 @@ def callback_time():
     return time_graph(data_to_show)
 
 def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "total"]):
-    # Plotting the data
-    fig = px.line(df_pandas, x="end_date", y=y,
+    if y == ['']:
+        # Return an empty plot
+        return "{}"
+
+    color_map = {
+        "diet": "red",
+        "transportation": "blue",
+        "housing": "green",
+        "consumption": "orange",
+        "waste": "purple",
+        "total": "gray"
+    }
+
+    fig = px.line(df_pandas, x="end_date", y=y, color_discrete_map=color_map,
                 title='Co2 Over Time')
     
     fig.update_layout(height=500, width=700)
@@ -547,7 +568,7 @@ def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "
 
 
 
-def gm(country='Spain'):
+def gm(country='Afghanistan'):
     global_average = 4.5
     global_objective = 0.5
     country_values = co2EmissionsCountry

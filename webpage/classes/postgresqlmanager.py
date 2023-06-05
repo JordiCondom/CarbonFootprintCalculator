@@ -51,6 +51,23 @@ class PostgreSQLManager:
             cursor.execute(create_table_query)
         self.conn.commit()
 
+    def check_table_exists(self, table_name):
+        
+        exists = False
+        columns = []
+
+        with self.conn.cursor() as cursor:
+            # Check if the table exists in the current schema
+            cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = %s)", (table_name,))
+            exists = cursor.fetchone()[0]
+
+            if exists:
+                # Retrieve the column names of the table
+                cursor.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", (table_name,))
+                columns = [row[0] for row in cursor.fetchall()]
+
+        return exists, columns
+
     def insert_data(self, table_name, response_data):
         input_data_columns = [key.lower() for key in response_data.keys()]
         input_data_values = list(response_data.values())
@@ -100,8 +117,12 @@ class PostgreSQLManager:
 
     def delete_all_table_data(self, table_name):
         with self.conn.cursor() as cursor:
-            delete_query = sql.SQL("""
-                DELETE FROM {table_name}
-            """).format(table_name=sql.Identifier(table_name))
+            # Delete all data from the table
+            delete_query = sql.SQL("DELETE FROM {table_name}").format(table_name=sql.Identifier(table_name))
             cursor.execute(delete_query)
+
+            # Drop the table
+            drop_query = sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name))
+            cursor.execute(drop_query)
+
         self.conn.commit()

@@ -1,15 +1,55 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Dashboard Page</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
-  </head>
-  <body>
-  <div class="container">
+<head>
+  <title>Dashboard Page</title>
+  <link rel="stylesheet" type="text/css" href="/static/style.css">
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.9); 
+    
+    }
+    
+    .button_dashboard {
+      display: inline-block;
+      padding: 1rem 2rem;
+      margin: 0.2rem;
+      font-size: 1.5rem;
+      color: white;
+      background: linear-gradient(to bottom right, #8BC34A, #4CAF50);
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+
+    header {
+      padding: 2.3rem;
+      background-color: rgba(51, 51, 51, 0.9);
+    }
+
+    nav {
+      display: flex;
+      justify-content: flex-end;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <nav>
     <a href="/logout" class="logout-button">Logout</a>
-    <h1>Welcome to your Carbon Footprint Calculator {{ username }}!</h1>
-    <a href="/input" class="button">Input carbon footprint data</a><br><br>
-    <a href="/track" class="button">Profile</a><br><br>
-  </div>
-  </body>
+  </nav>
+</header>
+<div class="container">
+  <h1>Welcome to your Carbon Footprint Calculator {{ username }}!</h1>
+  <br><br><br>
+  <a href="/input" class="button_dashboard">Input carbon footprint data</a><br><br>
+  <a href="/track" class="button_dashboard">Profile</a><br><br>
+</div>
+</body>
 </html>

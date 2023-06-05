@@ -31,6 +31,8 @@ class footprintCalculator:
             'housing': housing,
             'consumption': consumption,
             'waste': waste,
+            'number_of_days': self.number_of_days,
+            'average_per_day': total/self.number_of_days,
             'total': total 
         }
 
