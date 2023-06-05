@@ -48,36 +48,15 @@ class SparkManager:
     def loadDF_with_tablename(self, table_name):
         jdbc_url = "jdbc:postgresql://localhost:5858/mydatabase"
 
-        query = f"""
-        SELECT start_date
-        FROM   {table_name}
-        """
-
-        query_min_max = f"""
-        SELECT Min(start_date),
-            Max(start_date)
-        FROM   ({query}) s
-        """
-
-        # Determine min and maximum values
-        df_min_max = self.spark.read.format("jdbc").option("url",jdbc_url) \
-            .option("driver", "org.postgresql.Driver").option("dbtable", f"({query_min_max}) t") \
-            .option("user", "postgres").option("password", "password").load()
-        
-        min_date = df_min_max.collect()[0]['min']
-        max_date = df_min_max.collect()[0]['max']
-
-
         df = self.spark.read.format("jdbc").option("url", jdbc_url) \
             .option("driver", "org.postgresql.Driver").option("dbtable", table_name) \
             .option("user", "postgres").option("password", "password")\
-            .option("partitionColumn", "start_date") \
             .option("numPartitions", 5) \
-            .option("lowerBound", min_date) \
-            .option("upperBound", max_date) \
             .load()
+        
+        df = df.orderBy(F.col('start_date'))
 
-        return min_date, max_date, df
+        return 0, 0, df
     
 
     def fill_df(self, df):
