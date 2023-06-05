@@ -21,6 +21,29 @@
 			width: 100%; /* Make the message boxes fill the available width */
 			box-sizing: border-box; /* Include padding and border in the box width */
 		}
+
+		.stylish-link {
+			color: #0a3900; /* Set the color of the link */
+			text-decoration: none; /* Remove underline */
+			font-weight: bold; /* Add bold font weight */
+			font-size: 18px; /* Set font size */
+		}
+
+		.stylish-link:hover {
+			color: #00ff00; /* Set color when hovering over the link */
+		}
+
+		.grid-container {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr); /* Adjust the number of columns as needed */
+			gap: 20px; /* Adjust the gap between grid items */
+			text-align: center;
+		}
+
+			.grid-item {
+			width: 100%;
+		}
+
 	</style>
     <script>
         function cb(selection) {
@@ -168,9 +191,61 @@
 
 	<section id="carbonoffset">
 		<div class="container reveal">
-			<p> Just plant trees </p>
+			<h1>Carbon Offsetting</h1>
+			<p> Welcome to the world of carbon offsetting, a powerful tool in the fight against excesive carbon footprints. Carbon offsetting involves investing in projects that reduce or remove carbon dioxide from the atmosphere. One common method is purchasing Renewable Energy Certificates (RECs) to support clean energy generation. Another avenue is tree-planting initiatives, which sequester carbon and promote biodiversity. While carbon offsetting is important, it should complement efforts to reduce emissions at the source. Together, we can make a positive impact and create a more sustainable future for our planet.</p>
 		</div>
 	</section>
+
+	<section id="carbonoffset">
+		<div class="container reveal">
+			<p>Here are the quantities of trees required to offset your carbon footprint across various categories:</p>
+			<div id="piechart2trees"></div>
+		</div>
+	</section>
+
+	<section id="carbonoffset">
+		<div class="container reveal">
+			<p>Ecosia is a widely recognized carbon offsetting tool that functions as an internet search engine. It distinguishes itself by planting trees in response to the number of searches conducted by its users. For every 45 searches performed through Ecosia, a tree is planted, making it an effective and impactful way to contribute to reforestation efforts:</p>
+			<div style="text-align: center;">
+				<a href="https://www.ecosia.org/" class="stylish-link">
+				  <img src="https://cdn-static.ecosia.org/indexpage/img/above-fold@2x.16f30ae.webp">
+				  Ecosia searcher
+				</a>
+			</div>		
+		</div>
+	</section>
+
+	<section id="carbonoffset">
+		<div class="container reveal">
+			<div class="grid-container">
+				<div class="grid-item">
+				  <a href="https://terrapass.co.uk/?utm_source=terrapass.com&utm_medium=referral&utm_campaign=redirect" class="stylish-link">
+					<img src="https://assets.terrapass.com/wp-content/uploads/2021/01/terrapass-logo.jpg" width="300" height="150">
+					Terrapass, carbon offsetting subscriptions
+				  </a>
+				</div>
+				<div class="grid-item">
+					<a href="https://verra.org/about/overview/#" class="stylish-link">
+					  <img src="https://verra.org/wp-content/uploads/kasigau-lisa-kristine.jpg" width="300" height="150">
+					  Verra, greenhouse gas (GHG) crediting program
+					</a>
+				  </div>
+				  <div class="grid-item">
+					<a href="https://cotap.org/" class="stylish-link">
+					  <img src="https://cotap.org/wp-content/uploads/2023/01/logo.webp" width="300" height="150">
+					  COTAP both contributes to carbon offsetting while trying to alleviate global poverty
+					</a>
+				  </div>
+				  <div class="grid-item">
+					<a href="https://carbonfund.org/" class="stylish-link">
+					  <img src="https://carbonfund.org/wp-content/uploads/2023/04/Carbonfund-Powered-by-ClimeCo-Tucked-Large-png-1-360x74.png" width="300" height="150">
+					  Carbonfund.org, allows carbon offsetting in all shapes and sizes
+					</a>
+				  </div>
+			</div>
+		</div>	
+	</section>
+	
 
 
     <a href="/dashboard" class="button">Back to Dashboard</a>
@@ -194,6 +269,19 @@
 
 
 	// ------------------------------------------------
+
+	var pieGraphData2trees = {{ pie_graph_data_2_trees | tojson | safe }}
+
+	var pie_data2trees = JSON.parse(pieGraphData2trees);
+	// Configure the chart layout
+	var pie_layout2trees = {
+		title: 'Pie Chart',
+		height: 600,
+		width: 700
+	};
+
+	// Display the pie chart
+	Plotly.newPlot('piechart2trees', pie_data2trees, pie_layout2trees);
 	// Sun chart
 
 	var sunGraphData = {{sun_graph_data | tojson | safe }};

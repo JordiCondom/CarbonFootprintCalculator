@@ -477,6 +477,7 @@ def track_data():
     pie_variable_values = list(result.first().asDict().values())
     
     pie_graph_data = graph_creator.create_pie_chart(pie_labels, pie_variable_values)
+    pie_graph_data_2_trees = graph_creator.create_pie_chart_trees(pie_labels, pie_variable_values)
 
     # ---------------------------------------------------------------------------------------------------------------------
     #SUNBURST!!! 
@@ -520,7 +521,8 @@ def track_data():
                            error=error, from_date=from_date, to_date=to_date,
                            time_fig_graph_data=time_graph(),
                            countries = list(co2EmissionsCountry.keys()),
-                           recommendations_vector=recommendations_vector)
+                           recommendations_vector=recommendations_vector,
+                           pie_graph_data_2_trees=pie_graph_data_2_trees)
 
 @app.route('/deleteUserData', methods=['GET', 'POST'])
 def delete_user_date():

@@ -12,14 +12,14 @@ class graphCreator:
     def create_pie_chart(self, pie_labels,pie_variable_values):
 
         total_co2 = int(sum(pie_variable_values))
-        pie_variable_values_in_tones = [value / 1000 for value in pie_variable_values]
+        pie_variable_values_in_tones = ["{:.2f}".format(value / 1000) for value in pie_variable_values]
 
         piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values_in_tones, hole=0.5)])
 
         piefig.update_layout(
             annotations=[
                 dict(
-                    text= str(total_co2/1000) + "\n tons of CO2",  # The message you want to display
+                    text= "Total: " + str(total_co2/1000) + "\n tons of CO2",  # The message you want to display
                     x=0.5,  # X position of the annotation (0.5 means center horizontally)
                     y=0.5,  # Y position of the annotation (0.5 means center vertically)
                     showarrow=False,
@@ -29,6 +29,37 @@ class graphCreator:
             height=500, 
             width=700
         )   
+
+        piefig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20)
+
+        # Convert the figure to a JSON string
+        pie_graph_data = piefig.to_json()
+        return pie_graph_data
+    
+    def create_pie_chart_trees(self, pie_labels, pie_variable_values):
+
+        # 31 to 46 trees for tone/CO2
+        total_co2 = int(sum(pie_variable_values)*38/1000)
+        pie_variable_values_in_tones = [int(value*38 / 1000) for value in pie_variable_values]
+
+
+        piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values_in_tones, hole=0.5)])
+
+        piefig.update_layout(
+            annotations=[
+                dict(
+                    text= "Total: " + str(total_co2) + "\n trees",  # The message you want to display
+                    x=0.5,  # X position of the annotation (0.5 means center horizontally)
+                    y=0.5,  # Y position of the annotation (0.5 means center vertically)
+                    showarrow=False,
+                    font=dict(size=10)
+                )
+            ],
+            height=500, 
+            width=700
+        )   
+
+        piefig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20)
 
         # Convert the figure to a JSON string
         pie_graph_data = piefig.to_json()
@@ -41,7 +72,9 @@ class graphCreator:
             values = sun_values
         ))
 
-        sun_fig.update_layout(margin=dict(t=0, l=0, r=0, b=0))
+        sun_fig.update_layout(margin=dict(t=0, l=0, r=0, b=0),
+                                height=500, 
+                                width=700)
 
         sun_chart_data = sun_fig.to_json()
         return sun_chart_data
