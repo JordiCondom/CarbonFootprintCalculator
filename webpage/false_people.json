@@ -1,31 +1,62 @@
-data = {
-  'user1' : {
-    'start_date': ,
-    'end_date': ,
-    'number_of_days':,
-    'answerDiet': ,
-    'answerWasteFoodPercentage':,
-    'answerLocalFood':,
+{
+  "user1" : {
+    "username": "pepito",
+    "password": "petito",
+    "data": [
+      {
+        "start_date": ,
+        "end_date": ,
+        "number_of_days":,
+        "answerDiet": ,
+        "answerWasteFoodPercentage":,
+        "answerLocalFood":,
 
-    'answerCarType':,
-    'answerCarTime':,
-    'answerCityBusTime':,
+        "answerCarType":,
+        "answerCarTime":,
+        "answerCityBusTime":,
 
-    'answerInterCityBusTime':,
-    'answerTrainTime':,
-    'origin_airports':,
-    'destination_airports':,
-    'cabin_classes':,
-    'round_trips':,
+        "answerInterCityBusTime":,
+        "answerTrainTime":,
+        "origin_airports":,
+        "destination_airports":,
+        "cabin_classes":,
+        "round_trips":,
 
-    'answerHowManyPeople':,
-    'anwerHeatingType':,
+        "answerHowManyPeople":,
+        "anwerHeatingType":,
 
-    'anwerWasteMaterials':
-    'answerShoppingProfile':,
-    'answerPhoneLaptop':
-},
-  'user2' : {
+        "anwerWasteMaterials":,
+        "answerShoppingProfile":,
+        "answerPhoneLaptop":
+    }, {
+        "start_date": ,
+        "end_date": ,
+        "number_of_days":,
+        "answerDiet": ,
+        "answerWasteFoodPercentage":,
+        "answerLocalFood":,
+
+        "answerCarType":,
+        "answerCarTime":,
+        "answerCityBusTime":,
+
+        "answerInterCityBusTime":,
+        "answerTrainTime":,
+        "origin_airports":,
+        "destination_airports":,
+        "cabin_classes":,
+        "round_trips":,
+
+        "answerHowManyPeople":,
+        "anwerHeatingType":,
+
+        "anwerWasteMaterials":,
+        "answerShoppingProfile":,
+        "answerPhoneLaptop":
+      }
+    ]
+  },
+  "user2" : {
     
   }
-:  }
+}
