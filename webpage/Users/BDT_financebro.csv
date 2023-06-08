@@ -1,0 +1,7 @@
+start_date;end_date;number_of_days;answerDiet;answerWasteFoodPercentage;answerLocalFood;answerCarType;answerCarTime;answerCityBusTime;answerInterCityBusTime;answerTrainTime;origin_airports;destination_airports;cabin_classes;round_trips;answerHowManyPeople;anwerHeatingType;anwerWasteMaterials;answerShoppingProfile;answerPhoneLaptop
+"""2023-01-01""";"""2023-03-01""";59,00;Heavy_meat;12;no;Gasoline;60;;;3;[''];[''];[''];[''];1;gas_methane;;highShoppingProfile;
+"""2023-03-01""";"""2023-05-01""";61,00;Heavy_meat;13;no;Gasoline;55;;;4;[''];[''];[''];[''];1;gas_methane;;highShoppingProfile;
+"""2023-05-01""";"""2023-07-01""";61,00;Heavy_meat;15;no;Gasoline;50;;;5;[''];[''];[''];[''];1;gas_methane;;highShoppingProfile;laptop
+"""2023-07-01""";"""2023-09-01""";62,00;Heavy_meat;15;no;Gasoline;45;;;2;[''];[''];[''];[''];1;gas_methane;;highShoppingProfile;
+"""2023-09-01""";"""2023-11-01""";61,00;Heavy_meat;10;no;Gasoline;40;;;2;[''];[''];[''];[''];1;gas_methane;;highShoppingProfile;
+"""2023-11-01""";"""2024-1-01""";61,00;Heavy_meat;10;no;Gasoline;45;;;2;[''];[''];[''];[''];1;gas_methane;;highShoppingProfile;
