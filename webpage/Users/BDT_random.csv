@@ -1,7 +1,0 @@
-start_date;end_date;number_of_days;answerDiet;answerWasteFoodPercentage;answerLocalFood;answerCarType;answerCarTime;answerCityBusTime;answerInterCityBusTime;answerTrainTime;origin_airports;destination_airports;cabin_classes;round_trips;answerHowManyPeople;anwerHeatingType;anwerWasteMaterials;answerShoppingProfile;answerPhoneLaptop
-"""2023-01-01""";"""2023-03-01""";59,00;Heavy_meat;20;yes;Electric;30;;;2;[''];[''];[''];[''];3;notKnow;Glass, Plastic, Paper, Aluminium;averageShoppingProfile;
-"""2023-03-01""";"""2023-05-01""";61,00;Heavy_meat;18;yes;Electric;30;5;;;[''];[''];[''];[''];3;notKnow;Glass, Plastic, Paper, Aluminium;averageShoppingProfile;
-"""2023-05-01""";"""2023-07-01""";61,00;Heavy_meat;19;yes;Electric;28;8;;;[''];[''];[''];[''];3;notKnow;Glass, Plastic, Paper, Aluminium;averageShoppingProfile;
-"""2023-07-01""";"""2023-09-01""";62,00;Heavy_meat;20;yes;Electric;25;3;;;[''];[''];[''];[''];3;notKnow;Glass, Plastic, Paper, Aluminium;averageShoppingProfile;phone
-"""2023-09-01""";"""2023-11-01""";61,00;Heavy_meat;19;yes;Electric;27;;;12;[''];[''];[''];[''];3;notKnow;Glass, Plastic, Paper, Aluminium;averageShoppingProfile;
-"""2023-11-01""";"""2024-1-01""";61,00;Heavy_meat;18;yes;Electric;30;;;2;[''];[''];[''];[''];3;notKnow;Glass, Plastic, Paper, Aluminium;averageShoppingProfile;

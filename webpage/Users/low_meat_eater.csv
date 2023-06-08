@@ -1,0 +1,7 @@
+start_date,end_date,number_of_days,answerDiet,answerWasteFoodPercentage,answerLocalFood,answerCarType,answerCarTime,answerCityBusTime,answerInterCityBusTime,answerTrainTime,origin_airports,destination_airports,cabin_classes,round_trips,answerHowManyPeople,anwerHeatingType,anwerWasteMaterials,answerShoppingProfile,answerPhoneLaptop
+2023-01-01,2023-03-01,59,Some_meat,20,yes,Plug-in Hybrid Electric,20,10,,4,[''],[''],[''],[''],1,notKnow,[''],lowShoppingProfile,phone
+2023-03-01,2023-05-01,61,Some_meat,10,no,Plug-in Hybrid Electric,19,5,,5,[''],[''],[''],[''],1,notKnow,[''],lowShoppingProfile,
+2023-05-01,2023-07-01,61,Some_meat,15,yes,Plug-in Hybrid Electric,20,5,,6,[''],[''],[''],[''],1,notKnow,[''],lowShoppingProfile,
+2023-07-01,2023-09-01,62,Some_meat,13,yes,Plug-in Hybrid Electric,18,10,,5,[''],[''],[''],[''],1,notKnow,[''],lowShoppingProfile,laptop
+2023-09-01,2023-11-01,61,Some_meat,9,no,Plug-in Hybrid Electric,15,9,,4,[''],[''],[''],[''],1,notKnow,[''],lowShoppingProfile,
+2023-11-01,2024-1-01,61,Some_meat,7,no,Plug-in Hybrid Electric,20,9,,6,[''],[''],[''],[''],1,notKnow,[''],lowShoppingProfile,

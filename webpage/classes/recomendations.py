@@ -54,7 +54,7 @@ def recomendations(dataframe):
         elif dataframe['wasteAluminium'][0] == 1:
             reduction = 0.96
         else:
-            raise Exception('Probelm in the code with Waste')
+            raise Exception('Problem in the code with Waste')
         res.append(('waste', (temp, reduction)))
 
     # Tech
