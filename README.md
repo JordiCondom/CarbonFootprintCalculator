@@ -9,7 +9,7 @@ The following section highlights the conversion factors and choices adopted in t
 
 ## Food section
 ### Diet
-Following the decision made by GoClimate Calculator, we have based the categories and values for the users diet from a study by Scarborough et al (2014):
+Following the decision made by GoClimate Calculator, we have based the categories and values for the users diet from a study by Scarborough et al (2014)[^1]:
 	
 | **Diet**                    | **Kg CO2e/day** |
 |-----------------------------|-----------------|
@@ -21,3 +21,4 @@ Following the decision made by GoClimate Calculator, we have based the categorie
 | Heavy meat (> 100 g/day)    | 7,19            |
 
 
+[^1]: Scarborough, P., Appleby, P.N., Mizdrak, A. et al. Dietary greenhouse gas emissions of meat-eaters, fish-eaters, vegetarians and vegans in the UK. Climatic Change 125, 179–192 (2014). https://link.springer.com/article/10.1007/s10584-014-1169-1
