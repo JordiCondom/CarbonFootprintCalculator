@@ -13,7 +13,6 @@ from classes.airportFootprintManager import AirportFootprintManager
 from classes.datesManager import DatesManager
 from classes.footprintcalculator import footprintCalculator
 from classes.graphcreator import graphCreator
-from classes.mongodbmanager import MongoDBManager
 import psycopg2
 from psycopg2 import sql
 from pyspark.sql.functions import col
@@ -80,8 +79,8 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        mongo_manager = MongoDBManager('CarbonFootprintCalculator', 'Users')
-        if mongo_manager.check_login(username, password):
+        redis_manager = RedisManager('localhost', 6379, 2)
+        if redis_manager.check_login(username, password):
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
         else:
@@ -96,20 +95,21 @@ def register():
         username = request.form['username']
         password = request.form['password']
         repeat_password = request.form['repeat_password']
-        mongo_manager = MongoDBManager('CarbonFootprintCalculator', 'Users')
+        redis_manager = RedisManager('localhost', 6379, 2)
 
-        if mongo_manager.users_collection.find_one({'username': username}): # Username exists -> error
+        if redis_manager.check_username_exists(username): # Username exists -> error
             error = "Username already exists. Please choose a different one."  # Set error message
         elif password != repeat_password:
             error = "Password not matching"
         else: # Create username 
             # Update the user data in the JSON file
             user = {
+                'id': username,
                 'username': username,
                 'password': password
             }
             
-            mongo_manager.insert_user(user)
+            redis_manager.insert_user(user)
             
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
@@ -321,151 +321,7 @@ def track_data():
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
     print(df.show())
     df = spark_manager.fill_df(df)
-    '''
-    df = df.orderBy("start_date")
-    print(df.show())
 
-    min_start_date = df.selectExpr("min(start_date)").first()[0]
-    max_start_date = df.selectExpr("max(start_date)").first()[0]
-
-    # Create an empty DataFrame with the same schema as the original DataFrame
-    empty_df = spark.createDataFrame([], schema=df.schema)
-
-    # Sort the DataFrame by start_date
-
-    # Iterate through each row in the sorted DataFrame
-    for i in range(sorted_df.count()):
-        row = sorted_df.collect()[i]
-        start_date = row.start_date
-        end_date = row.end_date
-
-        # If it's not the first row, create a row with the start date as the end date of the previous row
-        if i > 0:
-            prev_row = sorted_df.collect()[i - 1]
-            prev_end_date = prev_row.end_date
-            missing_start_date = prev_end_date + timedelta(days=1)
-            missing_end_date = start_date - timedelta(days=1)
-            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-            empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
-
-        # Append the original row to the empty DataFrame
-        empty_df = empty_df.union(spark.createDataFrame([row], schema=df.schema))
-
-        # If it's the last row, create a row with the end date as the start date of the next row
-        if i == sorted_df.count() - 1:
-            next_row = sorted_df.collect()[i]
-            next_start_date = next_row.start_date
-            missing_start_date = end_date + timedelta(days=1)
-            missing_end_date = next_start_date - timedelta(days=1)
-            new_row = (missing_start_date, missing_end_date, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-            empty_df = empty_df.union(spark.createDataFrame([new_row], schema=df.schema))
-
-    # Sort the DataFrame by start_date
-    new_df = empty_df.orderBy("start_date")
-    new_df = new_df.filter(col("start_date") < col("end_date"))
-
-    df = new_df
-
-    # Convert DataFrame to a list of rows
-    rows = df.collect()
-
-    # Create a new list for updated rows
-    updated_rows = []
-
-    # Iterate over each row
-    for i in range(len(rows)):
-        current_row = rows[i]
-        prev_row = rows[i - 1] if i > 0 else None
-        next_row = rows[i + 1] if i < len(rows) - 1 else None
-        
-        # Calculate the new diet value based on the formula
-        if current_row["diet"] == 0:
-            columns_to_change = ["diet", "car", "bustrain", "transportation","housing", "consumption", "waste", "total"]
-            updated_row = current_row.asDict()
-            for column in columns_to_change:
-                if column == "total":
-                    updated_row[column] = updated_row["diet"] + updated_row["transportation"] + updated_row["housing"] + updated_row["consumption"] + updated_row["waste"]
-                elif column == "transportation":
-                    updated_row[column] = updated_row["car"] + updated_row["bustrain"]
-                else:
-                    prev_value = prev_row[column] if prev_row else 0
-                    next_value = next_row[column] if next_row else 0
-                    prev_num_days = prev_row["number_of_days"] if prev_row else 0
-                    next_num_days = next_row["number_of_days"] if next_row else 0
-                    new_value = current_row["number_of_days"] * (prev_value + next_value) / (prev_num_days + next_num_days)
-                    
-                    # Create a new row with updated diet value
-                    updated_row[column] = new_value
-                    
-            # Append the updated row to the list
-            updated_rows.append(updated_row)
-        else:
-            # Append the original row to the list
-            updated_rows.append(current_row.asDict())
-
-    # Create a new DataFrame from the updated list of rows
-    df_filled = spark.createDataFrame(updated_rows, df.schema)
-
-    print(df_filled.show())
-    df = df_filled
-    '''
-
-    '''
-    if request.method == 'POST':
-        from_date = request.form.get('fromDate')
-        to_date = request.form.get('toDate')
-        key = str(username) + str(from_date) + str(to_date)
-        if from_date > to_date:
-            error = "Watch out, the start date is later than the end date!"
-        else:
-            if (redis_manager.key_exists_boolean(key)):
-                graph_data = redis_manager.get_value_by_key(key)
-                return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
-            else:
-                # Get the data for the current user from the database
-                user_data = postgresql_manager.get_data_from_date_range(f'user_{username}', from_date, to_date)
-
-                if user_data:
-                    df = pd.DataFrame(user_data, columns=['datetime', 'food', 'transportation', 'household', 'expenses', 'total'])
-
-                    # Create a dictionary to store the data for each date
-                    dates = sorted(list(set(df['datetime'])))
-                    date_data = {date: {'food': [], 'transportation': [], 'household': [], 'expenses': [], 'total': []} for date in dates}
-
-                    graph_manager = graphCreator(df, dates, date_data)
-                    graph_data = graph_manager.create_tracking_graphs()
-                    redis_manager.set_key_value(key, graph_data)
-
-                    return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', 
-                                           error=error, 
-                                           from_date = from_date,
-                                           to_date = to_date)
-                else:
-                    error = "No data available for this range of dates"
-    
-    # Get the data for the current user from the database
-    if df.count() > 0:
-        from_date = df.selectExpr('min(start_date) as min_date').first()['min_date']
-        to_date = df.selectExpr('max(end_date) as max_date').first()['max_date']
-
-        key = str(username) + str(from_date) + str(to_date)
-
-        if redis_manager.key_exists_boolean(key):
-            graph_data = redis_manager.get_value_by_key(key)
-            return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}',
-                                error=error,
-                                from_date=from_date,
-                                to_date=to_date)
-        else:
-            dates = sorted(list(set(df.select(col('start_date')).collect())))
-            date_data = {date[0]: {'diet': [], 'transportation': [], 'car': [], 'bustrain': [], 'plane': [], 'housing': [], 'consumption': [], 'waste': [], 'total': []} for date in dates}
-            
-            graph_manager = graphCreator(df, dates, date_data)
-            graph_data = graph_manager.create_tracking_graphs()
-            redis_manager.set_key_value(key, graph_data)
-    else:
-        error = "No data available for this user"
-    '''
     # ---------------------------------------------------------------------------------------------------------------------
     # PIE CHART TOTAL
     pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
@@ -567,7 +423,6 @@ def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "
     timegraphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
         
     return timegraphJSON
-
 
 
 def gm(country='Afghanistan'):

@@ -106,29 +106,6 @@
 			<a href="/logout" class="logout-button">Logout</a>
 		</nav>
 	</header>
-	<h1>Track Data</h1>
-
-	<section id="dates">
-		<div class="container reveal">
-		<form action="/track" method="post">
-			<div class="form-group">
-			<label for="fromDate">From:</label>
-			<input type="date" id="fromDate" name="fromDate" class="form-control">
-			</div>
-			
-			<div class="form-group">
-			<label for="toDate">To:</label>
-			<input type="date" id="toDate" name="toDate" class="form-control">
-			</div>
-			
-			<input type="submit" value="Track data within selected dates">
-
-			{% if error %}
-			<p style="color: red">{{ error }}</p>
-			{% endif %}
-		</form>
-		</div>
-	</section>
 	
 	<section id="data_track">
 		<div class="container reveal">

@@ -1,5 +1,4 @@
 Flask
-pymongo
 psycopg2
 matplotlib
 numpy

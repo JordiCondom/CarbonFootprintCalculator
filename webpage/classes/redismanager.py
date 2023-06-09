@@ -61,3 +61,55 @@ class RedisManager:
         
         # Delete the username itself
         self.r.delete(username)
+
+
+    def insert_user(self, user_data):
+        user_id = user_data.get('id')
+        self.r.hmset(f"user:{user_id}", user_data)
+        print(f"User inserted with id: {user_id}")
+
+    def list_users(self):
+        user_keys = self.r.keys("user:*")
+        for key in user_keys:
+            user_data = self.r.hgetall(key)
+            print(user_data)
+
+    def delete_all_users(self):
+        user_keys = self.r.keys("user:*")
+        for key in user_keys:
+            self.r.delete(key)
+        print(f"Deleted {len(user_keys)} users")
+
+    def delete_user_by_username(self, username):
+        user_keys = self.r.keys("user:*")
+        deleted_count = 0
+        for key in user_keys:
+            user_data = self.r.hgetall(key)
+            current_username = user_data[b'username'].decode()
+            if current_username == username:
+                self.r.delete(key)
+                deleted_count += 1
+        if deleted_count > 0:
+            print(f"Deleted {deleted_count} user(s) with username '{username}'")
+        else:
+            print(f"No user found with username '{username}'")
+
+    def check_login(self, username, password):
+        user_keys = self.r.keys("user:*")
+        for key in user_keys:
+            user_data = self.r.hgetall(key)
+
+            current_username = user_data[b'username'].decode()
+            current_password = user_data[b'password'].decode()
+            if current_username == username and current_password == password:
+                return True
+        return False
+    
+    def check_username_exists(self, username):
+        user_keys = self.r.keys("user:*")
+        for key in user_keys:
+            user_data = self.r.hgetall(key)
+            current_username = user_data[b'username'].decode()
+            if current_username == username:
+                return True
+        return False

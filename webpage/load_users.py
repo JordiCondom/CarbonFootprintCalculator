@@ -4,13 +4,13 @@ import pandas as pd
 from classes.footprintcalculator import footprintCalculator
 import csv
 
-from classes.mongodbmanager import MongoDBManager
 from classes.postgresqlmanager import PostgreSQLManager
+from classes.redismanager import RedisManager
 
 user_files = ["vegan", "mixed_diet", "low_meat_eater", "pescetarian", "heavy_consumer", "average_consumer", "average_consumer_plus_plane", "random"]
 
-mongo_manager = MongoDBManager('CarbonFootprintCalculator', 'Users')
 postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
+redis_manager = RedisManager('localhost', 6379, 2)
 
 for user in user_files:
     print("User: ", user)
@@ -18,11 +18,12 @@ for user in user_files:
     df.fillna(0, inplace=True)
 
     user_data = {
+        'id': user,
         'username': user,
         'password': user
     }
             
-    mongo_manager.insert_user(user_data)
+    redis_manager.insert_user(user_data)
 
     table_name_carbon = f'user_{user}_carbon_footprint'
 
@@ -45,8 +46,6 @@ for user in user_files:
     postgresql_manager.create_table(table_name_carbon, columns_cf)
 
     for index, row in df.iterrows():
-        print("Row Index:", index)
-        print("Row Data:", row)
 
         row_dict = row.to_dict()
         row_dict['origin_airports'] = ast.literal_eval(row_dict['origin_airports'])
