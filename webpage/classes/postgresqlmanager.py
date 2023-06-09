@@ -11,11 +11,11 @@ class PostgreSQLManager:
         self.database = database
 
         self.conn = psycopg2.connect(
-            host=self.host,
-            port=self.port,
-            user=self.user,
-            password=self.password,
-            database=self.database
+            host="0.0.0.0",
+            user="docker",
+            port=5432,
+            password="docker",
+            database="mydatabase"
         )
     
     def close_connection(self):

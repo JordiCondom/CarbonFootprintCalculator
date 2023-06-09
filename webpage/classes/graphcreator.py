@@ -66,6 +66,7 @@ class graphCreator:
         return pie_graph_data
     
     def create_sun_chart(self, sun_labels, sun_parents, sun_values):
+        
         sun_fig = go.Figure(go.Sunburst(
             labels=sun_labels,
             parents=sun_parents,
@@ -75,6 +76,7 @@ class graphCreator:
         sun_fig.update_layout(margin=dict(t=0, l=0, r=0, b=0),
                                 height=500, 
                                 width=700)
+        
 
         sun_chart_data = sun_fig.to_json()
         return sun_chart_data

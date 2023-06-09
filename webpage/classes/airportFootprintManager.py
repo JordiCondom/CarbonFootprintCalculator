@@ -51,7 +51,7 @@ class AirportFootprintManager:
                 'currencies[]': ['EUR']
             }
 
-        # Make the GET request
+        # Make the GET request for carbon footprint of the given flight
         response = requests.get(self.api_url, params=params, auth=(self.api_key, ''))
 
         # Check if the request was successful (status code 200)

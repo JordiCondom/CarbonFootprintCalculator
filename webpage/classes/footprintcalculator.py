@@ -13,8 +13,7 @@ class footprintCalculator:
         housing = self.computeHousingCarbonFootprint()
         consumption = self.computeConsumptionCarbonFootprint()
         waste = self.computeWasteCarbonFootprint()
-        unavoidable_footprint = 1240*(1/365)*(self.number_of_days)
-        total = diet + transportation + housing + consumption + waste + unavoidable_footprint
+        total = diet + transportation + housing + consumption + waste
 
         car = self.computeCarCarbonFootprint()
         plane = self.computerPlaneCarbonFootprint()

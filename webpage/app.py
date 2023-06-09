@@ -77,15 +77,13 @@ def cb():
 def login():
     error = None  # Initialize error message to None
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
         redis_manager = RedisManager('localhost', 6379, 2)
-        if redis_manager.check_login(username, password):
-            session['username'] = username  # Store the username in a session variable
+        if redis_manager.check_login(request.form['username'], request.form['password']):
+            session['username'] = request.form['username']  # Store the username in a session variable
             return redirect('/dashboard')
         else:
             error = "Invalid login credentials. Please try again."  # Set error message, which will appear in the html
-    return render_template('login.html', error=error)  # Pass error message to the template
+    return render_template('login.html', error=error)  
 
 # Register page
 @app.route('/register', methods=['GET', 'POST'])
@@ -98,24 +96,21 @@ def register():
         redis_manager = RedisManager('localhost', 6379, 2)
 
         if redis_manager.check_username_exists(username): # Username exists -> error
-            error = "Username already exists. Please choose a different one."  # Set error message
-        elif password != repeat_password:
+            error = "Username already exists. Please choose a different one." 
+        elif password != repeat_password: # Passwords not matching -> error
             error = "Password not matching"
         else: # Create username 
-            # Update the user data in the JSON file
-            user = {
+            redis_manager.insert_user({
                 'id': username,
                 'username': username,
                 'password': password
-            }
-            
-            redis_manager.insert_user(user)
+            })
             
             session['username'] = username  # Store the username in a session variable
             return redirect('/dashboard')
     return render_template('registration.html', error=error)  # Pass error message to the template
 
-# Page with to access the input, track and recommendations pages
+# Main page
 @app.route('/dashboard',  methods=['GET', 'POST'])
 def dashboard():
     if 'username' in session:
@@ -129,8 +124,10 @@ def input_data():
     if 'username' not in session: 
         return redirect('/logout')
     
-    error = None
     username = session['username']
+
+    redis_manager = RedisManager('localhost', 6379, 1)
+    postgresql_manager = PostgreSQLManager('0.0.0.0',5858,'docker', 'docker', 'mydatabase')
     airportManager = AirportFootprintManager()
     airport_names = airportManager.list_airport_names()
 
@@ -140,25 +137,21 @@ def input_data():
         end_date = request.form.get('end-date')
 
         dates_manager = DatesManager(date_range_type, start_date, end_date)
-
         start_date = dates_manager.get_start_date()
         end_date = dates_manager.get_end_date()
         number_of_days = dates_manager.get_number_of_days()
-
-        redis_manager = RedisManager('localhost', 6379, 1)
         
+        # Check if data exists for existing dates
         old_start_date = None
         old_end_date = None
         dates_overlap = redis_manager.check_date_overlap(username, start_date, end_date)
-        if dates_overlap[0]:
+        if dates_overlap[0]: # if exists, data gets overwritten
             old_start_date = dates_overlap[1]
             old_end_date = dates_overlap[2]
             redis_manager.delete_date_range(username, dates_overlap[1], dates_overlap[2])
         
+        # save dates in redis for further checks
         redis_manager.store_date_range(username, start_date, end_date)
-        # 1 check if date exists in a range 
-        # If exists -> Put an error message and say that in case it exists it will replace the one that is already there
-        # If not exists -> All ok, save the range of dates and proceed with the questionnaire
             
         
         response_data = {
@@ -189,13 +182,7 @@ def input_data():
             'answerPhoneLaptop': request.form.getlist('phoneLaptopQuestion[]'),
         }
 
-        postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
-        #  postgresql_manager = PostgreSQLManager('postgres','5432','postgres','password','mydatabase')
-
-        # Retrieve the username from the Flask session
-        
-        
-        # SAVE ANSWERS
+        # Create answers database to save the answers
         table_name_answers = f'user_{username}_answers'
         
         columns = [
@@ -229,8 +216,7 @@ def input_data():
         postgresql_manager.create_table(table_name_answers, columns)
         postgresql_manager.insert_data(table_name_answers, response_data)
 
-
-        # SAVE CARBON FOOTPRINT
+        # Create carbon footprint database to save carbon footprint data
         carbon_footprint_manager = footprintCalculator(response_data)
         carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
 
@@ -251,9 +237,9 @@ def input_data():
             'total FLOAT'
         ]
         postgresql_manager.create_table(table_name_carbon, columns_cf)
-
         postgresql_manager.insert_data(table_name_carbon,carbon_footprint)
         
+        # If dates overlap, delete the existing data of previous dates
         if dates_overlap[0]:
             postgresql_manager.delete_table_sample_by_dates(table_name_carbon, old_start_date, old_end_date)
 
@@ -263,6 +249,7 @@ def input_data():
         
     return render_template('input.html', airports=airport_names)
 
+# Page to track the data, get the recommendations and study possible carbon offsetting
 @app.route('/track', methods=['GET', 'POST'])
 def track_data():
     if 'username' not in session: 
@@ -273,88 +260,47 @@ def track_data():
     username = session['username']
     table_name_carbon = f'user_{username}_carbon_footprint'
     redis_manager = RedisManager('localhost', 6379, 0)
-    #postgresql_manager = PostgreSQLManager('localhost', 5858, 'postgres', 'password', 'mydatabase')
     graph_creator = graphCreator()
-
     spark_manager = SparkManager(spark)
 
-    if request.method == 'POST':
-        from_date = request.form.get('fromDate')
-        to_date = request.form.get('toDate')
-        key = str(username) + str(from_date) + str(to_date)
-        if from_date > to_date:
-            error = "Watch out, the start date is later than the end date!"
-        else: 
-            if (redis_manager.key_exists_boolean(key)):
-                graph_data = redis_manager.get_value_by_key(key)
-                return render_template('track.html', plot_url1=f'data:image/png;base64,{graph_data}', error=error)
-            else: 
-                df = spark_manager.loadDF_with_tablename_and_dates(table_name_carbon, from_date, to_date)
-                print(df.show())
-
-                if df:
-                    pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
-                    # Calculate the sum of each column for each pie_label
-                    sum_values = [F.sum(col).alias(label) for label, col in zip(pie_labels, pie_labels)]
-                    result = df.agg(*sum_values)
-
-                    pie_variable_values = list(result.first().asDict().values())
-
-                    piefig = go.Figure(data=[go.Pie(labels=pie_labels, values=pie_variable_values,hole=0.5)])
-
-                    # Convert the figure to a JSON string
-                    pie_graph_data = piefig.to_json()
-
-                    # TODO, store json as a string
-
-                    # Pass the graph data to the HTML template
-                    return render_template('track.html', pie_graph_data=pie_graph_data, 
-                                           horizontal_bar_data=horizontal_bar_data,
-                                           error=error, from_date=from_date, to_date=to_date,
-                                           countries = list(co2EmissionsCountry.keys()))
-                
-
-                else:
-                    error = "No data available for this range of dates"
-
-
+    # Get the current data on carbon footprint of the user and work with it as an apache spark dataframe 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
-    print(df.show())
+    # Fill data of missing dates in between the dates available
     df = spark_manager.fill_df(df)
+    print(df.show())
+    # Compute the sum of each column
+
+    columns_to_sum = ["total", "diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane"]
+    # Compute the sum of the specified columns and turn them into a dictionary
+    column_sums = df.select(*columns_to_sum).agg(*[F.sum(col).alias(col) for col in columns_to_sum])
+    column_sums_dict = column_sums.first().asDict()
 
     # ---------------------------------------------------------------------------------------------------------------------
-    # PIE CHART TOTAL
-    pie_labels = ['diet', 'transportation', 'housing', 'consumption', 'waste']
-    # Calculate the sum of each column for each pie_label
-    sum_values = [F.sum(col).alias(label) for label, col in zip(pie_labels, pie_labels)]
-    result = df.agg(*sum_values)
-
-    # Retrieve the sum values
-    pie_variable_values = list(result.first().asDict().values())
-    
+    # Pie chart of all data
+    pie_labels = ['Diet', 'Transportation', 'Housing', 'Consumption', 'Waste']
+    pie_variable_values = [column_sums_dict['diet'], column_sums_dict['transportation'], column_sums_dict['housing'],column_sums_dict['consumption'],column_sums_dict['waste']]
     pie_graph_data = graph_creator.create_pie_chart(pie_labels, pie_variable_values)
     pie_graph_data_2_trees = graph_creator.create_pie_chart_trees(pie_labels, pie_variable_values)
 
     # ---------------------------------------------------------------------------------------------------------------------
-    #SUNBURST!!! 
+    #Sunburst chart 
 
-    sun_labels = ["total","diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane" ]
-    sun_parents = ["","total", "total", "total", "total", "total", "transportation", "transportation", "transportation"]
-    sun_values = [F.sum(col).alias(label) for label, col in zip(sun_labels, sun_labels)]
-    result2 = df.agg(*sun_values)
+    sun_labels = ["Total","Diet", "Transportation", "Housing", "Consumption", "Waste", "Car", "Public transport", "Plane" ]
+    sun_parents = ["","Total", "Total", "Total", "Total", "Total", "Transportation", "Transportation", "Transportation"]
 
-    pie2_variable_values = list(result2.first().asDict().values())
+
+    pie2_variable_values = [column_sums_dict['total'], column_sums_dict['diet'], column_sums_dict['transportation'], column_sums_dict['housing'], column_sums_dict['consumption'],
+                            column_sums_dict['waste'], column_sums_dict['car'], column_sums_dict['bustrain'], column_sums_dict['plane']]
     sun_graph_data = graph_creator.create_sun_chart(sun_labels, sun_parents, pie2_variable_values)
     
     # ---------------------------------------------------------------------------------------------------------------------
     # Horizontal bars
 
-    #mock data:
     min_start_date = df.select(F.min("start_date")).first()[0]
     max_end_date = df.select(F.max("end_date")).first()[0]
     number_of_days = (max_end_date - min_start_date).days
 
-    total_sum = df.select(F.sum("total")).first()[0]
+    total_sum = column_sums_dict['total']
     global annual_average_in_tons
     annual_average_in_tons = (total_sum/number_of_days)*(365/1000)
 
@@ -374,7 +320,7 @@ def track_data():
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
                            sun_graph_data=sun_graph_data,
-                           error=error, from_date=from_date, to_date=to_date,
+                           error=error, from_date=min_start_date, to_date=max_end_date,
                            time_fig_graph_data=time_graph(),
                            countries = list(co2EmissionsCountry.keys()),
                            recommendations_vector=recommendations_vector,
@@ -385,7 +331,7 @@ def delete_user_date():
     username = session['username']
     table_name_answers = f'user_{username}_answers'
     table_name_carbon = f'user_{username}_carbon_footprint'
-    postgresql_manager = PostgreSQLManager('localhost',5858,'postgres', 'password', 'mydatabase')
+    postgresql_manager = PostgreSQLManager('0.0.0.0',5858,'docker', 'docker', 'mydatabase')
     redis_manager = RedisManager('localhost', 6379, 1)
 
     redis_manager.delete_user_data(username)
@@ -471,7 +417,6 @@ def gm(country='Afghanistan'):
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     
     return graphJSON
-
 
 
 @app.route('/logout')

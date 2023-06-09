@@ -2,13 +2,14 @@ version: '3'
 services:
 
   postgres:
-    image: postgres:latest
+    image: postgres
     ports:
-      - 5858:5432
+      - "5432:5432"
+    restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=mydatabase
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: mydatabase
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
