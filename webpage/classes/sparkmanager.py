@@ -25,6 +25,7 @@ class SparkManager:
 
     def fill_df(self, df):
         sum_days = df.select(F.sum('number_of_days')).first()[0]
+        n_rows = df.count()
 
         # Compute the average per day for the other columns
         average_df = df.agg(
@@ -33,7 +34,13 @@ class SparkManager:
             (F.sum('bustrain') / sum_days).alias('average_bustrain'),
             (F.sum('housing') / sum_days).alias('average_housing'),
             (F.sum('consumption') / sum_days).alias('average_consumption'),
-            (F.sum('waste') / sum_days).alias('average_waste')
+            (F.sum('waste') / sum_days).alias('average_waste'),
+            (F.sum('shopping_profile') / n_rows).alias('average_shopping_profile'),
+            (F.sum('refurbished') / n_rows).alias('average_refurbished'),
+            (F.sum('plastic') / n_rows).alias('average_plastic'),
+            (F.sum('glass') / n_rows).alias('average_glass'),
+            (F.sum('paper') / n_rows).alias('average_paper'),
+            (F.sum('aluminium') / n_rows).alias('average_aluminium'),
         )
 
         # Retrieve the average per day values
@@ -46,6 +53,12 @@ class SparkManager:
         average_housing = average_row['average_housing']
         average_consumption = average_row['average_consumption']
         average_waste = average_row['average_waste'] 
+        average_shopping_profile = average_row['average_shopping_profile']
+        average_refurbished = average_row['average_refurbished']
+        average_plastic = average_row['average_plastic']
+        average_glass = average_row['average_glass']
+        average_paper = average_row['average_paper']
+        average_aluminium = average_row['average_aluminium']
 
         date_columns = df.select("start_date", "end_date")
 
@@ -72,16 +85,24 @@ class SparkManager:
                 housing = average_housing*number_of_days
                 consumption = average_consumption*number_of_days
                 waste = average_waste*number_of_days
+                shopping_profile = average_shopping_profile
+                refurbished = average_refurbished
+                plastic = average_plastic
+                glass = average_glass
+                paper = average_paper
+                aluminium = average_aluminium
                 transportation = car + bustrain
                 total = diet + transportation + housing + consumption + waste
                 plane = 0
                 average_per_day = total/number_of_days
-                consecutive_date_pairs_filled.append((start_date, end_date, diet, transportation, car, bustrain, plane, housing, consumption, waste, number_of_days, average_per_day, total))
+                consecutive_date_pairs_filled.append((start_date, end_date, diet, transportation, car, bustrain, plane, housing, consumption, 
+                                                      shopping_profile,refurbished,waste,plastic,glass,paper, aluminium,number_of_days, average_per_day, total))
 
             start_date, end_date = next_start_date, next_end_date
 
-        columns = ['start_date', 'end_date', 'diet', 'transportation', 'car', 'bustrain', 'plane', 'housing', 'consumption', 'waste', 'number_of_days', 'average_per_day', 'total']
-        
+        columns = ['start_date', 'end_date', 'diet', 'transportation', 'car', 'bustrain', 'plane', 'housing', 'consumption',
+                   'shopping_profile', 'refurbished', 'waste', 'plastic', 'glass', 'paper', 'aluminium' 'number_of_days', 'average_per_day', 'total']
+
         if consecutive_date_pairs_filled:
             filled_dates_df = self.spark.createDataFrame(consecutive_date_pairs_filled, columns)
 

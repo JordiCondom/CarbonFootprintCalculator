@@ -1,5 +1,6 @@
 
 import ast
+import datetime
 import pandas as pd
 from classes.footprintcalculator import footprintCalculator
 import csv
@@ -11,6 +12,7 @@ user_files = ["vegan", "mixed_diet", "low_meat_eater", "pescetarian", "heavy_con
 
 postgresql_manager = PostgreSQLManager('0.0.0.0',5858, 'docker', 'docker', 'mydatabase')
 redis_manager = RedisManager('localhost', 6379, 2)
+redis_manager_1 = RedisManager('localhost', 6379, 1)
 
 for user in user_files:
     print("User: ", user)
@@ -37,13 +39,13 @@ for user in user_files:
             'plane FLOAT',
             'housing FLOAT',
             'consumption FLOAT',
-            'shopping_profile INT',
-            'refurbished INTEGER',
+            'shopping_profile FLOAT',
+            'refurbished FLOAT',
             'waste FLOAT',
-            'plastic INTEGER',
-            'glass INTEGER',
-            'paper INTEGER',
-            'aluminium INTEGER',
+            'plastic FLOAT',
+            'glass FLOAT',
+            'paper FLOAT',
+            'aluminium FLOAT',
             'number_of_days FLOAT',
             'average_per_day FLOAT',
             'total FLOAT'
@@ -51,12 +53,12 @@ for user in user_files:
 
     postgresql_manager.create_table(table_name_carbon, columns_cf)
 
-    print(postgresql_manager.check_table_exists(table_name_carbon))
-
     for index, row in df.iterrows():
 
         row_dict = row.to_dict()
-        redis_manager.store_date_range(user, row_dict['start_date'], row_dict['end_date'])
+        start_date = datetime.datetime.strptime(row_dict['start_date'], '%Y-%m-%d').date()
+        end_date = datetime.datetime.strptime(row_dict['end_date'], '%Y-%m-%d').date()
+        redis_manager_1.store_date_range(user, start_date, end_date)
 
         row_dict['origin_airports'] = ast.literal_eval(row_dict['origin_airports'])
         row_dict['destination_airports'] = ast.literal_eval(row_dict['destination_airports'])

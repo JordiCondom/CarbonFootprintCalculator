@@ -236,13 +236,13 @@ def input_data():
             'plane FLOAT',
             'housing FLOAT',
             'consumption FLOAT',
-            'shopping_profile INT',
-            'refurbished INTEGER',
+            'shopping_profile FLOAT',
+            'refurbished FLOAT',
             'waste FLOAT',
-            'plastic INTEGER',
-            'glass INTEGER',
-            'paper INTEGER',
-            'aluminium INTEGER',
+            'plastic FLOAT',
+            'glass FLOAT',
+            'paper FLOAT',
+            'aluminium FLOAT',
             'number_of_days FLOAT',
             'average_per_day FLOAT',
             'total FLOAT'
@@ -275,7 +275,6 @@ def track_data():
 
     # Get the current data on carbon footprint of the user and work with it as an apache spark dataframe 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
-    print(df.show())
     # Fill data of missing dates in between the dates available
     df = spark_manager.fill_df(df)
     # Compute the sum of each column
@@ -307,10 +306,11 @@ def track_data():
     
     # ---------------------------------------------------------------------------------------------------------------------
     # Horizontal bars
-
     min_start_date = df.select(F.min("start_date")).first()[0]
     max_end_date = df.select(F.max("end_date")).first()[0]
     number_of_days = (max_end_date - min_start_date).days
+    global time_dates
+    time_dates = pd.date_range(start=min_start_date, end=max_end_date)
 
     total_sum = column_sums_dict['total']
     global annual_average_in_tons
@@ -322,14 +322,40 @@ def track_data():
 
     # Create a line time chart plot
 
+    selected_columns = ["end_date","diet", "transportation", "housing", "consumption", "waste", "total", "number_of_days"]
+    
+    local_df_pandas = df.toPandas()[selected_columns]
+
+    new_df = local_df_pandas.copy()
+
+    # Initialize an empty list to store the exploded rows
+    exploded_rows = []
+
+    # Iterate over each row in the DataFrame
+    for index, row in local_df_pandas.iterrows():
+        # Get the number of days for the current row
+        num_days = int(row['number_of_days'])
+        
+        # Divide the values of selected columns by the number of days
+        divided_values = row[selected_columns[1:]].div(num_days)
+        
+        # Create new rows by repeating the divided values
+        exploded = divided_values.explode().to_frame().T
+        
+        # Append the exploded rows to the list
+        for _ in range(num_days):
+            exploded_rows.append(exploded)
+        
+    # Concatenate the exploded rows to create the new DataFrame
+    new_df = pd.concat(exploded_rows).reset_index(drop=True)
+
     global df_pandas
-    df_pandas = df.toPandas()
+    df_pandas = new_df
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Recommendations
     recommendations_manager = RecommendationsManager(column_sums_dict)
     recommendations_vector = recommendations_manager.generate_recommendations(df.count())
-    print(recommendations_vector)
 
 
     return render_template('track.html', pie_graph_data=pie_graph_data, 
@@ -376,8 +402,12 @@ def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "
         "total": "gray"
     }
 
-    fig = px.line(df_pandas, x="end_date", y=y, color_discrete_map=color_map,
+    dates = time_dates[:df_pandas.shape[0]]
+
+    fig = px.line(df_pandas, x=dates, y=y, color_discrete_map=color_map,
                 title='Co2 Over Time')
+    
+
     
     fig.update_layout(height=500, width=700)
 
