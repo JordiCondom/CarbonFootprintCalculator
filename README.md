@@ -24,7 +24,7 @@ Following the decision made by GoClimate Calculator, we have based the categorie
 To account for food waste emissions, we chose to increase dietary emissions by the amount of food that was wasted. A 10% waste raises the user's diet-specific emissions proportionately. We chose to focus on the production side of food waste because the literature on the subject emphasizes the emissions of organic waste as a composition of gardening residuals in landfills rather than compost.
 
 ### Local food
-Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature[2^] it is said that:
+Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature[^2] it is said that:
 > [...] the sum of emissions from packaging, transport, and retail contributes just 1 to 9%.
 
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
