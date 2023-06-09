@@ -10,17 +10,14 @@ The following section highlights the conversion factors and choices adopted in t
 ## Food section
 ### Diet
 Following the decision made by GoClimate Calculator, we have based the categories and values for the users diet from a study by Scarborough et al (2014):
+	
+| **Diet**                    | **Kg CO2e/day** |
+|-----------------------------|-----------------|
+| Vegan                       | 2,89            |
+| Vegetarian                  | 3,81            |
+| Pescetarian                 | 3,91            |
+| Some meat (< 50 g/day)      | 4,67            |
+| Regular meat (50-100 g/day) | 5,63            |
+| Heavy meat (> 100 g/day)    | 7,19            |
 
-**diet name**			**kg CO2e/day**
-
-Vegan				2,89 
-Vegetarian			3,81
-Pescetarian			3,91
-Some meat (< 50 g/day)	4,67
-Regular meat (50-100 g/day)	5,63
-Heavy meat (> 100 g/day)	7,19
-| Column 1 | Column 2 | Column 3 |
-| -------- | -------- | -------- |
-| Row 1    | Row 1    | Row 1    |
-| Row 2    | Row 2    | Row 2    |
 
