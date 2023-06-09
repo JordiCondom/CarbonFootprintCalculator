@@ -9,7 +9,7 @@ The following section highlights the conversion factors and choices adopted in t
 
 ## Food section
 ### Diet
-Following the decision made by GoClimate Calculator, we have based the categories and values for the users diet from a study by Scarborough et al (2014)[^1]:
+Following the decision made by GoClimate Calculator[^1], we have based the categories and values for the users diet from a study by Scarborough et al (2014)[^2]:
 	
 | **Diet**                    | **Kg CO2e/day** |
 |-----------------------------|-----------------|
@@ -24,11 +24,13 @@ Following the decision made by GoClimate Calculator, we have based the categorie
 To account for food waste emissions, we chose to increase dietary emissions by the amount of food that was wasted. A 10% waste raises the user's diet-specific emissions proportionately. We chose to focus on the production side of food waste because the literature on the subject emphasizes the emissions of organic waste as a composition of gardening residuals in landfills rather than compost.
 
 ### Local food
-Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature[^2] it is said that:
+Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature[^3] it is said that:
 > [...] the sum of emissions from packaging, transport, and retail contributes just 1 to 9%.
 
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
+## Transportation
+We accounted for the “transportation” emissions referencing Ourworldindata[^4] for the public services like trains and buses, and private cars. Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^5].
 
 
 
@@ -38,6 +40,17 @@ So we decided to reduce the user’s emissions by an average of 5% if they consi
 
 
 
+[^1]: Go Climate Methodology report https://drive.google.com/file/d/1x0GbM7LDahU07RghHfj6JysBmdDHUZBc/view
 
-[^1]: Scarborough, P., Appleby, P.N., Mizdrak, A. et al. Dietary greenhouse gas emissions of meat-eaters, fish-eaters, vegetarians and vegans in the UK. Climatic Change 125, 179–192 (2014). https://link.springer.com/article/10.1007/s10584-014-1169-1
-[^2]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
+[^2]: Scarborough, P., Appleby, P.N., Mizdrak, A. et al. Dietary greenhouse gas emissions of meat-eaters, fish-eaters, vegetarians and vegans in the UK. Climatic Change 125, 179–192 (2014). https://link.springer.com/article/10.1007/s10584-014-1169-1
+
+[^3]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
+
+[^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
+
+[^5]: GoClimate API Reference https://api.goclimate.com/docs
+
+
+
+
+
