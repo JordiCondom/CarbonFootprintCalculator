@@ -26,6 +26,7 @@ from pyspark.sql.window import Window
 from pyspark.sql.functions import lag, lead, col
 
 from classes.postgresqlmanager import PostgreSQLManager
+from classes.recommendationsManager import RecommendationsManager
 from classes.redismanager import RedisManager
 from classes.sparkmanager import SparkManager
 
@@ -231,7 +232,13 @@ def input_data():
             'plane FLOAT',
             'housing FLOAT',
             'consumption FLOAT',
+            'shopping_profile INT',
+            'refurbished INTEGER',
             'waste FLOAT',
+            'plastic INTEGER',
+            'glass INTEGER',
+            'paper INTEGER',
+            'aluminium INTEGER',
             'number_of_days FLOAT',
             'average_per_day FLOAT',
             'total FLOAT'
@@ -259,7 +266,6 @@ def track_data():
     graph_data = None
     username = session['username']
     table_name_carbon = f'user_{username}_carbon_footprint'
-    redis_manager = RedisManager('localhost', 6379, 0)
     graph_creator = graphCreator()
     spark_manager = SparkManager(spark)
 
@@ -270,7 +276,9 @@ def track_data():
     print(df.show())
     # Compute the sum of each column
 
-    columns_to_sum = ["total", "diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane"]
+    columns_to_sum = ["total", "diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane", "shopping_profile",
+                      "refurbished", "plastic", "glass", "paper", "aluminium", "number_of_days"]
+    
     # Compute the sum of the specified columns and turn them into a dictionary
     column_sums = df.select(*columns_to_sum).agg(*[F.sum(col).alias(col) for col in columns_to_sum])
     column_sums_dict = column_sums.first().asDict()
@@ -315,8 +323,11 @@ def track_data():
 
     # ---------------------------------------------------------------------------------------------------------------------
     # Recommendations
-    recommendations_vector = ["Eat less meat Eat less meat Eat less meat Eat less meat Eat less meat", "Use your car less", "Use more public transport", "Don't consume that much", "Recycle more"]
+    recommendations_manager = RecommendationsManager(column_sums_dict)
+    recommendations_vector = recommendations_manager.generate_recommendations(df.count())
+    print(recommendations_vector)
 
+    
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
                            sun_graph_data=sun_graph_data,

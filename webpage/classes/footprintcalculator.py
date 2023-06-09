@@ -6,6 +6,12 @@ class footprintCalculator:
     def __init__(self, data):
         self.data = data
         self.number_of_days = self.data['number_of_days']
+        self.shopping_profile = 0
+        self.refurbished = 0
+        self.plastic = 0
+        self.glass = 0
+        self.paper = 0
+        self.aluminium = 0
 
     def computeCarbonFootprint(self):
         diet = self.computeDietCarbonFootprint()
@@ -29,10 +35,16 @@ class footprintCalculator:
             'plane': plane,
             'housing': housing,
             'consumption': consumption,
+            'shopping_profile': self.shopping_profile,
+            'refurbished': self.refurbished,
             'waste': waste,
+            'plastic': self.plastic,
+            'glass': self.glass,
+            'paper': self.paper,
+            'aluminium': self.aluminium,
             'number_of_days': self.number_of_days,
             'average_per_day': total/self.number_of_days,
-            'total': total 
+            'total': total
         }
 
         return carbonFootprint
@@ -170,6 +182,13 @@ class footprintCalculator:
             'highShoppingProfile': 1.5
         }
 
+        if current_shopping_profile == 'lowShoppingProfile':
+            self.shopping_profile = -1
+        elif current_shopping_profile == 'averageShoppingProfile':
+            self.shopping_profile = 0
+        else: 
+            self.shopping_profile = 1
+
         current_shopping_facotr = shopping_footprint_factors.get(current_shopping_profile, 0)
         shopping_footprint = (EU_shopping_average_footprint*current_shopping_facotr)*(self.number_of_days)
 
@@ -181,6 +200,11 @@ class footprintCalculator:
                 'laptop': 300,
                 'refurbhisedLaptop': 30
             }
+
+            if ('phone' in current_electronics_buy) or ('laptop' in current_electronics_buy):
+                self.refurbished = 1
+            else:
+                self.refurbished = -1
 
             for product in current_electronics_buy:
                 shopping_footprint = shopping_footprint + electronics_footprint_factors.get(product,0)
@@ -198,6 +222,15 @@ class footprintCalculator:
             'Paper': (72.9)/365,
             'Aluminium': (26.5)/365
         }
+
+        if 'Plastic' in waste_vector:
+            self.plastic = 1
+        if 'Glass' in waste_vector:
+            self.glass = 1
+        if 'Paper' in waste_vector:
+            self.paper = 1
+        if 'Aluminium' in waste_vector:
+            self.aluminium = 1
 
         # kgCo2/kg material
         GHG_of_materials_not_recicled = {

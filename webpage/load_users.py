@@ -28,22 +28,30 @@ for user in user_files:
     table_name_carbon = f'user_{user}_carbon_footprint'
 
     columns_cf = [
-        'start_date DATE',
-        'end_date DATE',
-        'diet FLOAT',  
-        'transportation FLOAT',
-        'car FLOAT',
-        'bustrain FLOAT',
-        'plane FLOAT',
-        'housing FLOAT',
-        'consumption FLOAT',
-        'waste FLOAT',
-        'number_of_days FLOAT',
-        'average_per_day FLOAT',
-        'total FLOAT'
-    ]
+            'start_date DATE',
+            'end_date DATE',
+            'diet FLOAT',  
+            'transportation FLOAT',
+            'car FLOAT',
+            'bustrain FLOAT',
+            'plane FLOAT',
+            'housing FLOAT',
+            'consumption FLOAT',
+            'shopping_profile INT',
+            'refurbished INTEGER',
+            'waste FLOAT',
+            'plastic INTEGER',
+            'glass INTEGER',
+            'paper INTEGER',
+            'aluminium INTEGER',
+            'number_of_days FLOAT',
+            'average_per_day FLOAT',
+            'total FLOAT'
+        ]
 
     postgresql_manager.create_table(table_name_carbon, columns_cf)
+
+    print(postgresql_manager.check_table_exists(table_name_carbon))
 
     for index, row in df.iterrows():
 
@@ -61,6 +69,9 @@ for user in user_files:
         
 
         postgresql_manager.insert_data(table_name_carbon,carbon_footprint)
+
+
+postgresql_manager.close_connection()
 
 
         
