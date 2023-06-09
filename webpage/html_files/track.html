@@ -122,7 +122,7 @@
 
 	<section id="data_track">
 		<div class="container reveal">
-		<div><p>Compare your annual tons of CO2 with the average of countries, sets of countries, or worldwide. You can also compare it to the global objective of 2030:</p></div>
+		<div><p>Compare your annual tons of CO2 with the yearly per capita average of countries, sets of countries, or worldwide. You can also compare it to the global objective of 2030:</p></div>
 		<div>
 			<select id="country-select" onchange="cb(this.value)">
 				{% for country in countries %}
@@ -165,7 +165,7 @@
 			</p>
 			<br>
 			<p>
-				It is important to prioritize the reduction of our emissions while being mindful of our personal circumstances. Additionally, we must recognize that addressing carbon emissions is a global endeavor that requires collective efforts from all of humanity, including corporations, which are significant contributors to CO2 emissions. By taking individual action and encouraging systemic changes, we can work together to combat climate change.
+				It is important to prioritize the reduction of our emissions while being mindful of our personal circumstances. Additionally, we must recognize that addressing carbon emissions is a global endeavor that requires collective efforts from all of humanity, including corporations, which are significant contributors to CO2 emissions. By taking individual action and encouraging systematic changes, we can work together to combat climate change.
 			</p>
 			<br>
 			<p>
@@ -191,7 +191,7 @@
 
 	<section id="carbonoffset">
 		<div class="container reveal">
-			<p>Here are the quantities of trees required to offset your carbon footprint across various categories:</p>
+			<p>Number of trees required to plant to compensate your carbon footprint from {{from_date }} to {{to_date}}:</p>
 			<div id="piechart2trees"></div>
 		</div>
 	</section>

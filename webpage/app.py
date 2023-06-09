@@ -327,7 +327,7 @@ def track_data():
     recommendations_vector = recommendations_manager.generate_recommendations(df.count())
     print(recommendations_vector)
 
-    
+
     return render_template('track.html', pie_graph_data=pie_graph_data, 
                            graphJSON=gm(),
                            sun_graph_data=sun_graph_data,
@@ -383,13 +383,12 @@ def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "
 
 
 def gm(country='Afghanistan'):
-    global_average = 4.5
-    global_objective = 0.5
+    global_average = 4.8
     country_values = co2EmissionsCountry
     
     fig = go.Figure()
-    fig.add_trace(go.Bar(y=['International', 'Country', 'User Value', 'Global Objective'],
-                         x=[global_average, country_values[country], annual_average_in_tons, global_objective],
+    fig.add_trace(go.Bar(y=['Worldwide CF per capita', 'Country CF per capita', 'Your average CF', 'Global Objective'],
+                         x=[global_average, country_values[country], annual_average_in_tons, 0.8*country_values[country]],
                          marker=dict(
                             color='rgba(50, 171, 96, 0.6)',
                             line=dict(
