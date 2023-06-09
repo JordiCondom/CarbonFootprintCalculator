@@ -26,6 +26,7 @@ To account for food waste emissions, we chose to increase dietary emissions by t
 ### Local food
 Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature it is said that:
 > [...] the sum of emissions from packaging, transport, and retail contributes just 1 to 9%[2^].
+
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
 [2^]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
