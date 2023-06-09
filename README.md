@@ -29,7 +29,6 @@ Buying local food products, often from the city street markets, essentially mean
 
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
-[^2]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
 
 
 
@@ -41,3 +40,4 @@ So we decided to reduce the user’s emissions by an average of 5% if they consi
 
 
 [^1]: Scarborough, P., Appleby, P.N., Mizdrak, A. et al. Dietary greenhouse gas emissions of meat-eaters, fish-eaters, vegetarians and vegans in the UK. Climatic Change 125, 179–192 (2014). https://link.springer.com/article/10.1007/s10584-014-1169-1
+[^2]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
