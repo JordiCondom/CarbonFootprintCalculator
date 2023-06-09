@@ -126,7 +126,7 @@ def input_data():
         return redirect('/logout')
     
     username = session['username']
-
+    error = None
     redis_manager = RedisManager('localhost', 6379, 1)
     postgresql_manager = PostgreSQLManager('0.0.0.0',5858,'docker', 'docker', 'mydatabase')
     airportManager = AirportFootprintManager()
@@ -141,6 +141,10 @@ def input_data():
         start_date = dates_manager.get_start_date()
         end_date = dates_manager.get_end_date()
         number_of_days = dates_manager.get_number_of_days()
+
+        if start_date > end_date:
+            error = "The end date you have input is before start date, watch out inputting dates!"
+            return render_template('input.html', airports=airport_names, error=error)
         
         # Check if data exists for existing dates
         old_start_date = None
@@ -263,17 +267,17 @@ def track_data():
         return redirect('/logout')
     
     error = None
-    graph_data = None
     username = session['username']
     table_name_carbon = f'user_{username}_carbon_footprint'
     graph_creator = graphCreator()
     spark_manager = SparkManager(spark)
+    
 
     # Get the current data on carbon footprint of the user and work with it as an apache spark dataframe 
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
+    print(df.show())
     # Fill data of missing dates in between the dates available
     df = spark_manager.fill_df(df)
-    print(df.show())
     # Compute the sum of each column
 
     columns_to_sum = ["total", "diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane", "shopping_profile",

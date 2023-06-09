@@ -56,6 +56,8 @@ for user in user_files:
     for index, row in df.iterrows():
 
         row_dict = row.to_dict()
+        redis_manager.store_date_range(user, row_dict['start_date'], row_dict['end_date'])
+
         row_dict['origin_airports'] = ast.literal_eval(row_dict['origin_airports'])
         row_dict['destination_airports'] = ast.literal_eval(row_dict['destination_airports'])
         row_dict['cabin_classes'] = ast.literal_eval(row_dict['cabin_classes'])

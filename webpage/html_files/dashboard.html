@@ -47,9 +47,13 @@
 </header>
 <div class="container">
   <h1>Welcome to your Carbon Footprint Calculator {{ username }}!</h1>
+  {% if error %}
+  <p style="color: red">{{ error }}</p>
+  {% endif %}
   <br><br><br>
   <a href="/input" class="button_dashboard">Input carbon footprint data</a><br><br>
   <a href="/track" class="button_dashboard">Profile</a><br><br>
+  <a href="/deleteUserData" class="button_dashboard">Delete User Data</a><br><br>
 </div>
 </body>
 </html>
