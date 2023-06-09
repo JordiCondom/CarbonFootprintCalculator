@@ -99,7 +99,6 @@
 <div class="container">
 	<header>
 		<nav>
-			<a href="#dates" class="active">Dates</a>
 			<a href="#data_track">Data tracking</a>
 			<a href="#recommend">Recommendations</a>
 			<a href="#carbonoffset">Carbon offsetting</a>
@@ -109,20 +108,21 @@
 	
 	<section id="data_track">
 		<div class="container reveal">
-		<p>Here's a plot of the data from {{from_date }} to {{to_date}}:</p>
+		<p>Tons of CO2 by section from {{from_date }} to {{to_date}}:</p>
 		<div id="piechart"></div>
 		</div>
 	</section>
 
 	<section id="data_track">
 		<div class="container reveal">
-			<p>Here's a plot of the data from {{from_date }} to {{to_date}}:</p>
+			<p>Tons of CO2 by section emphasizing transports from {{from_date }} to {{to_date}}:</p>
 			<div id="sunchart"></div>
 		</div>
 	</section>
 
 	<section id="data_track">
 		<div class="container reveal">
+		<div><p>Compare your annual tons of CO2 with the average of countries, sets of countries, or worldwide. You can also compare it to the global objective of 2030:</p></div>
 		<div>
 			<select id="country-select" onchange="cb(this.value)">
 				{% for country in countries %}
@@ -136,6 +136,7 @@
 
 	<section id="data_track">
 		<div class="container reveal">
+			<div>Evolution in time of different carbon footprint activities:</div>
 			<div>
 				<label>What data do you want to plot?</label><br>
 				<div style="display: flex; justify-content: space-between;">
@@ -157,6 +158,21 @@
 		</div>
 	</section>
 
+	<section id="recommend">
+		<div class="container reveal">
+			<h1>Recommendations to reduce your carbon footprint</h1>
+			<p> According to the carbon footprint computed from your responses, we have generated personalized recommendations to assist you in reducing it. It is crucial to note that these recommendations should be considered within the context of your specific circumstances. While some methods of reducing your carbon footprint may be easily attainable, others may require more time and financial resources. For instance, investing in an electric car can significantly decrease your carbon emissions, but it may not be feasible for everyone due to the associated costs. Similarly, implementing solar panels or transitioning to a different heating system for your home entails considerations that vary depending on individual situations.
+			</p>
+			<br>
+			<p>
+				It is important to prioritize the reduction of our emissions while being mindful of our personal circumstances. Additionally, we must recognize that addressing carbon emissions is a global endeavor that requires collective efforts from all of humanity, including corporations, which are significant contributors to CO2 emissions. By taking individual action and encouraging systemic changes, we can work together to combat climate change.
+			</p>
+			<br>
+			<p>
+				With that said, next you can find your personalized recommenadtions :).
+			</p>
+		</div>
+	</section>
 	<section id="recommend">
 		<div class="container reveal">
 			<div class="grid">
@@ -194,6 +210,9 @@
 
 	<section id="carbonoffset">
 		<div class="container reveal">
+			<div>
+				<p>Here are some notable carbon offsetting initiatives that can assist you in your journey to reduce your carbon emissions:</p>
+			</div>
 			<div class="grid-container">
 				<div class="grid-item">
 				  <a href="https://terrapass.co.uk/?utm_source=terrapass.com&utm_medium=referral&utm_campaign=redirect" class="stylish-link">
