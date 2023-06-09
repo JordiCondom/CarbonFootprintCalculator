@@ -29,7 +29,7 @@ Buying local food products, often from the city street markets, essentially mean
 
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
-[2^]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
+[^2]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
 
 
 
