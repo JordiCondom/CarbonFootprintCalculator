@@ -20,5 +20,23 @@ Following the decision made by GoClimate Calculator, we have based the categorie
 | Regular meat (50-100 g/day) | 5,63            |
 | Heavy meat (> 100 g/day)    | 7,19            |
 
+### Food waste
+To account for food waste emissions, we chose to increase dietary emissions by the amount of food that was wasted. A 10% waste raises the user's diet-specific emissions proportionately. We chose to focus on the production side of food waste because the literature on the subject emphasizes the emissions of organic waste as a composition of gardening residuals in landfills rather than compost.
+
+### Local food
+Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature it is said that:
+> [...] the sum of emissions from packaging, transport, and retail contributes just 1 to 9%[2^].
+So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
+
+[2^]: J. Poore T. Nemecek ,Reducing food’s environmental impacts through producers and consumers.Science360,987-992(2018). doi:10.1126/science.aaq0216
+
+
+
+
+
+
+
+
+
 
 [^1]: Scarborough, P., Appleby, P.N., Mizdrak, A. et al. Dietary greenhouse gas emissions of meat-eaters, fish-eaters, vegetarians and vegans in the UK. Climatic Change 125, 179–192 (2014). https://link.springer.com/article/10.1007/s10584-014-1169-1
