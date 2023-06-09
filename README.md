@@ -30,8 +30,15 @@ Buying local food products, often from the city street markets, essentially mean
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
 ## Transportation
-We accounted for the “transportation” emissions referencing Ourworldindata[^4] for the public services like trains and buses, and private cars. Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^5].
+We accounted for transportation emissions referencing the website Ourworldindata[^4] for the public services like trains and buses, and private cars. Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^5].
 
+## Housing
+
+## Consumption
+
+## Methodological limitations 
+As mentioned above, in the retrieval of the conversion factors we encountered a number of issues. The free carbon footprint calculators available online, even when methodology reports where indeed available, didn’t expose the conversion factors of the survey they offered. So in many cases we couldn’t use pre-made factors. Furthermore, the precise methodology behind the creation of any given conversion factor is nowhere to be found. The reason being that each material/fuel/machine used in any daily activity requires specific knowledge about its production, efficiency, life-cycle, and so on. So the factors developed in the context of this project are extremely generic and couldn’t follow a precise methodology.
+As a result of the mentioned issues, the computations offered by the calculator are the best approximation we could reach, but an approximation nonetheless.
 
 
 
