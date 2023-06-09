@@ -1,11 +1,6 @@
-import base64
-import io
 import json
 import os
-from datetime import datetime, timedelta
-import time
-from flask import Flask, redirect, render_template, request, session, make_response
-from matplotlib.figure import Figure
+from flask import Flask, redirect, render_template, request, session
 import numpy as np
 import pandas as pd
 import plotly
@@ -13,17 +8,10 @@ from classes.airportFootprintManager import AirportFootprintManager
 from classes.datesManager import DatesManager
 from classes.footprintcalculator import footprintCalculator
 from classes.graphcreator import graphCreator
-import psycopg2
-from psycopg2 import sql
-from pyspark.sql.functions import col
 from pyspark.sql import SparkSession
 import plotly.graph_objects as go
 import pyspark.sql.functions as F
 import plotly.express as px
-from pyspark.sql.functions import col, expr, date_add, lit, min, max
-from pyspark.sql.types import DateType
-from pyspark.sql.window import Window
-from pyspark.sql.functions import lag, lead, col
 
 from classes.postgresqlmanager import PostgreSQLManager
 from classes.recommendationsManager import RecommendationsManager

@@ -1,6 +1,4 @@
-
 import random
-
 
 class RecommendationsManager:
     def __init__(self, data):

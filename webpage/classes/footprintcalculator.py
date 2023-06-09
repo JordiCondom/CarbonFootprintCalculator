@@ -1,4 +1,3 @@
-
 from classes.airportFootprintManager import AirportFootprintManager
 
 

@@ -1,9 +1,5 @@
 import datetime
-from pyspark.sql import SparkSession
-from pyspark.sql.types import StructField, StructType, StringType, LongType, TimestampType, ShortType, DateType
-from pyspark.sql.functions import col
 from pyspark.sql import functions as F
-from pyspark.sql.window import Window
 
 class SparkManager:
     def __init__(self, spark):

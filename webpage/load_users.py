@@ -1,9 +1,7 @@
-
 import ast
 import datetime
 import pandas as pd
 from classes.footprintcalculator import footprintCalculator
-import csv
 
 from classes.postgresqlmanager import PostgreSQLManager
 from classes.redismanager import RedisManager
