@@ -248,7 +248,7 @@ They opt for buying a phone in one of the periods.
 
 ## IMAGES
 
-![alt text](https://imgur.com/a/qCtxGmT)
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.37.png))
 
 
 
