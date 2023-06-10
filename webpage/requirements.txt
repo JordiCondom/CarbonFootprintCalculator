@@ -1,10 +1,10 @@
 Flask
-psycopg2-binary
-matplotlib
 numpy
 pandas
 psycopg2-binary
-psycopg2
-redis
 pyspark
-dash
+plotly
+ast
+datetime
+redis
+requests

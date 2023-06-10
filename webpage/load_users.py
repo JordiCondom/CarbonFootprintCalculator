@@ -71,6 +71,7 @@ for user in user_files:
         
 
         postgresql_manager.insert_data(table_name_carbon,carbon_footprint)
+        redis_manager.store_date_range(user, start_date, end_date)
 
 
 postgresql_manager.close_connection()

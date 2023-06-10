@@ -245,6 +245,7 @@ def input_data():
         if dates_overlap[0]:
             postgresql_manager.delete_table_sample_by_dates(table_name_carbon, old_start_date, old_end_date)
 
+
         postgresql_manager.close_connection()
 
         return redirect('/track')
@@ -265,7 +266,12 @@ def track_data():
     
 
     # Get the current data on carbon footprint of the user and work with it as an apache spark dataframe 
-    from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
+    try:
+        from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
+    except:
+        error = "No data available to plot"
+        return render_template('dashboard.html', error=error)
+        
     # Fill data of missing dates in between the dates available
     df = spark_manager.fill_df(df)
 
