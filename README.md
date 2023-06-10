@@ -255,8 +255,8 @@ Last but not least, for the generic consumption emission assessment, we decided 
 | Laptop     | 300     | 30               |
 
 
-## Tracking Data Plots examples:
-
+## Tracking Data Plots and Questionnaire screenshot examples:
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Questionnaire.png)
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.37.png)
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.46.png)
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.53.png)
