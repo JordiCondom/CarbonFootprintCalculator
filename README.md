@@ -108,7 +108,7 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 [^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
 
-[^5]: [A. Elric “等価交換”] (https://www.youtube.com/watch?v=8nm4chD_-Mg “Easter Egg”)
+[^5]: [A. Elric “等価交換”](https://www.youtube.com/watch?v=8nm4chD_-Mg “Easter Egg”)
 
 [^6]: GoClimate API Reference https://api.goclimate.com/docs
 
