@@ -23,7 +23,7 @@ To run the website server locally, open a new shell and execute:
 ```
 python3 ./app.py
 ```
-The local server is now running at: http://127.0.0.1:5000. At this point you can upload some test users using (Required Docker running):
+The local server is now running at: http://127.0.0.1:5000 and you are ready to input and track your data. At this point you can (not required but recommended) upload some test users using (Required Docker running) and check their profiles (User descriptions available below):
 ```
 pyhton3 ./load_user.py 
 ```
