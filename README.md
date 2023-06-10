@@ -53,32 +53,35 @@ Flights emissions are instead implemented thanks to the REST API of GoClimate li
 
 ## Housing
 To track the users' heating emissions in relation to their households, we used an online emission calculator [^7] for the exact conversion factors (kg CO2e/kWh) and an energy blog for the average kWh need of households. The specific conversions used are:
-<div style="display: flex;">
-  <table>
-    <!-- | Energy Type            | kg CO2e / kWh |
+
+| Energy Type            | kg CO2e / kWh |
 |------------------------|---------------|
 | Electric               | 0.34          |
 | Methane                | 0.18          |
 | Fuel Oil               | 0.25          |
 | Pellet                 | 0.0029        |
-| LPG (Liquefied Petroleum Gas) | 0.21  | -->
-  </table>
-  
-  <table>
-    <!-- | Household size | Mean kWh/day |
+| LPG (Liquefied Petroleum Gas) | 0.21  |
+
+While the average kWh consumption per Household size is:
+
+| Household size | Mean kWh/day |
 |-------------|--------------|
 | 1           | 4            |
 | 2           | 6            |
 | 3           | 7.5          |
 | 4           | 9            |
-| 5+           | 10           | -->
-  </table>
-</div>
+| 5+           | 10           |
 
 
-While the average kWh consumption per Household size is:
-
-
+## Waste
+Computing waste emissions was quite challenging as we had to take a long path to assess municipal waste weight[^8] and composition[^9] in Europe. Then we referred to the specific material-industry sector reports to assess the impact of production/recycling/landfilling of the materials. When the data conversion was too complex (_preatty often_) we resorted to the production emissions, mainly because some materials produced more greenhouse gasses if they were recycled with respect to thrown in a landfill. Production emissions were instead a reliable indicator for all materials. The conversion factors used are as follows:
+| Material        | avg % in Municipal Waste (Europe) | kgCO2e/kg[^10] |
+|-----------------|----------------------------------|-----------|
+| Plastic         | 10.00%                           | 2.7       |
+| Paper           | 30.00%                           | 0.13      |
+| Glass           | 7.50%                            | 0.6       |
+| Non Ferrous     | 5.00%                            | 0.392     |
+| Ferrous Metals  | 2.00%                            | 2.7       |
 
 
 
@@ -105,8 +108,22 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 [^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
 
-[^5]: A. Elric “等価交換” https://www.youtube.com/watch?v=8nm4chD_-Mg
+[^5]: [A. Elric “等価交換”] (https://www.youtube.com/watch?v=8nm4chD_-Mg “Easter Egg”)
 
 [^6]: GoClimate API Reference https://api.goclimate.com/docs
 
 [^7]: https://www.carbonfootprint.com/calculator.aspx
+
+[^8]: Average Municipal waste in EU 2021 https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Municipal_waste_statistics
+
+[^9]: Waste composition % in EUhttps://www.researchgate.net/publication/225979972_Separate_collection_and_biological_waste_treatment_in_the_European_Community
+
+[^10]: [Plastic emissions (Paper - page 13)](https://www.eionet.europa.eu/etcs/etc-wmge/products/etc-wmge-reports/greenhouse-gas-emissions-and-natural-capital-implications-of-plastics-including-biobased-plastics/@@download/file/ETC_2.1.2.1._GHGEmissionsOfPlastics_FinalReport_v7.0_ED.pdf)
+
+[Paper emissions (Website)](https://www.holmen.com/en/paper/sustainability/sustainability-stories/how-to-undrestand-carbon-footprints/)
+
+[Glass emissions (Glass industry sector report - page 2)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-glass_en.pdf)
+
+[Aluminum emissions (Aluminum industry sector report - page 13)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-aluminium_en.pdf)
+
+[Steel emissions (Website)](https://www.sustainable-ships.org/stories/2022/carbon-footprint-steel)
