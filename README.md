@@ -84,8 +84,17 @@ Computing waste emissions was quite challenging as we had to take a long path to
 | Ferrous Metals  | 2.00%                            | 2.7       |
 
 
-
 ## Consumption
+Last but not least, for the generic consumption emission assessment, we decided to focus on clothing[^11] and technological[^12] expenditure:
+|          | kgCO2e | kg fibers per capita| kgCO2/kg fibers |
+|----------|-------|------------|----------------|
+| UE       | 1210  | 31.21      | 38.77          |
+
+|            | kg CO2e | refurbished (=10%) |
+|------------|---------|------------------|
+| Smartphone | 70      | 7                |
+| Laptop     | 300     | 30               |
+
 
 
 ## Methodological limitations 
@@ -108,7 +117,7 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 [^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
 
-[^5]: [A. Elric “等価交換”](https://www.youtube.com/watch?v=8nm4chD_-Mg)
+[^5]: [A. Elric “等価交換”] (https://www.youtube.com/watch?v=8nm4chD_-Mg)
 
 [^6]: GoClimate API Reference https://api.goclimate.com/docs
 
@@ -118,4 +127,16 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 [^9]: Waste composition % in EUhttps://www.researchgate.net/publication/225979972_Separate_collection_and_biological_waste_treatment_in_the_European_Community
 
-[^10]: [Plastic emissions (Paper - page 13)](https://www.eionet.europa.eu/etcs/etc-wmge/products/etc-wmge-reports/greenhouse-gas-emissions-and-natural-capital-implications-of-plastics-including-biobased-plastics/@@download/file/ETC_2.1.2.1._GHGEmissionsOfPlastics_FinalReport_v7.0_ED.pdf) – [Paper emissions (Website)](https://www.holmen.com/en/paper/sustainability/sustainability-stories/how-to-undrestand-carbon-footprints/) – [Glass emissions (Glass industry sector report - page 2)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-glass_en.pdf) – [Aluminum emissions (Aluminum industry sector report - page 13)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-aluminium_en.pdf) – [Steel emissions (Website)](https://www.sustainable-ships.org/stories/2022/carbon-footprint-steel)
+[^10]: [Plastic emissions (Paper - page 13)](https://www.eionet.europa.eu/etcs/etc-wmge/products/etc-wmge-reports/greenhouse-gas-emissions-and-natural-capital-implications-of-plastics-including-biobased-plastics/@@download/file/ETC_2.1.2.1._GHGEmissionsOfPlastics_FinalReport_v7.0_ED.pdf) – 
+[Paper emissions (Website)](https://www.holmen.com/en/paper/sustainability/sustainability-stories/how-to-undrestand-carbon-footprints/) – 
+[Glass emissions (Glass industry sector report - page 2)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-glass_en.pdf) – 
+[Aluminum emissions (Aluminum industry sector report - page 13)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-aluminium_en.pdf) – 
+[Steel emissions (Website)](https://www.sustainable-ships.org/stories/2022/carbon-footprint-steel)
+
+[^11]: [Clothes emissions (Global apparel/footwear industries report - page 19)](https://quantis.com/wp-content/uploads/2018/03/measuringfashion_globalimpactstudy_full-report_quantis_cwf_2018a.pdf)
+
+[^12]: [Tech (Website)](https://www.goclimate.com/blog/the-carbon-footprint-of-shopping/) – 
+[Tech refurbished (Website)](https://impakter.com/by-buying-your-smartphone-refurbished-rather-than-new-you-can-save-over-77kg-of-co2) 
+
+
+
