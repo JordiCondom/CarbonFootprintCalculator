@@ -5,9 +5,6 @@ class SparkManager:
     def __init__(self, spark):
         self.spark = spark
 
-''' JDBC stands for Java Database Connectivity. It is a Java API (Application Programming Interface) 
-that allows Java programs to interact with relational databases. JDBC provides a set of classes and methods that
-enable database operations such as connecting to a database, executing SQL queries, and retrieving and manipulating data '''
 
     def loadDF_with_tablename(self, table_name):
         # Load a DataFrame from a PostgreSQL table using JDBC
@@ -116,7 +113,7 @@ enable database operations such as connecting to a database, executing SQL queri
             # Create a DataFrame from the filled consecutive date pairs
             filled_dates_df = self.spark.createDataFrame(consecutive_date_pairs_filled, columns)
 
-            num_partitions = 30
+            num_partitions = 10
             print('num_partitions: ', num_partitions)
 
             # Repartition the original DataFrame and the filled dates DataFrame
