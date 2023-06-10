@@ -30,7 +30,16 @@ Buying local food products, often from the city street markets, essentially mean
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
 ## Transportation
-We accounted for transportation emissions referencing the website Ourworldindata[^4] for the public services like trains and buses, and private cars. Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^5].
+
+### Local food
+Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature[^3] it is said that:
+> [...] the sum of emissions from packaging, transport, and retail contributes just 1 to 9%.
+
+So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
+
+## Transportation
+We accounted for transportation emissions referencing the website Ourworldindata[^4] for the public services like trains and buses, and private cars. To make the questionnaire user-friendly we decided to ask for the time spent in the mean of transportation instead of the actual kilometers traveled (_seriously… who could answer that?_). Unfortunately, as someone once said “To obtain, something of equal value must be lost”[^5] and to obtain an answerable question, here we made the assumption about the average driving speed, generalized for both city and countryside streets.
+Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^6].
 
 ## Housing
 
@@ -47,6 +56,7 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 
 
+
 [^1]: Go Climate Methodology report https://drive.google.com/file/d/1x0GbM7LDahU07RghHfj6JysBmdDHUZBc/view
 
 [^2]: Scarborough, P., Appleby, P.N., Mizdrak, A. et al. Dietary greenhouse gas emissions of meat-eaters, fish-eaters, vegetarians and vegans in the UK. Climatic Change 125, 179–192 (2014). https://link.springer.com/article/10.1007/s10584-014-1169-1
@@ -55,9 +65,6 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 [^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
 
-[^5]: GoClimate API Reference https://api.goclimate.com/docs
-
-
-
-
+[^5]: A. Elric “等価交換” https://www.youtube.com/watch?v=8nm4chD_-Mg
+[^6]: GoClimate API Reference https://api.goclimate.com/docs
 
