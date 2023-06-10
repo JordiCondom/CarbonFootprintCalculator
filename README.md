@@ -80,4 +80,4 @@ As a result of the mentioned issues, the computations offered by the calculator 
 
 [^6]: GoClimate API Reference https://api.goclimate.com/docs
 
-[^7] https://www.carbonfootprint.com/calculator.aspx
+[^7]: https://www.carbonfootprint.com/calculator.aspx
