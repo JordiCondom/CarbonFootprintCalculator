@@ -52,9 +52,38 @@ While for public transportation we extracted an online emission calculator [^7] 
 Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^6].
 
 ## Housing
+To track the users' heating emissions in relation to their households, we used an online emission calculator [^7] for the exact conversion factors (kg CO2e/kWh) and an energy blog for the average kWh need of households. The specific conversions used are:
+<div style="display: flex;">
+  <table>
+    <!-- | Energy Type            | kg CO2e / kWh |
+|------------------------|---------------|
+| Electric               | 0.34          |
+| Methane                | 0.18          |
+| Fuel Oil               | 0.25          |
+| Pellet                 | 0.0029        |
+| LPG (Liquefied Petroleum Gas) | 0.21  | -->
+  </table>
+  
+  <table>
+    <!-- | Household size | Mean kWh/day |
+|-------------|--------------|
+| 1           | 4            |
+| 2           | 6            |
+| 3           | 7.5          |
+| 4           | 9            |
+| 5+           | 10           | -->
+  </table>
+</div>
+
+
+While the average kWh consumption per Household size is:
+
+
+
 
 
 ## Consumption
+
 
 ## Methodological limitations 
 As mentioned above, in the retrieval of the conversion factors we encountered a number of issues. The free carbon footprint calculators available online, even when methodology reports where indeed available, didn’t expose the conversion factors of the survey they offered. So in many cases we couldn’t use pre-made factors. Furthermore, the precise methodology behind the creation of any given conversion factor is nowhere to be found. The reason being that each material/fuel/machine used in any daily activity requires specific knowledge about its production, efficiency, life-cycle, and so on. So the factors developed in the context of this project are extremely generic and couldn’t follow a precise methodology.
