@@ -10,6 +10,7 @@ class DatesManager:
         self.set_start_end_date(start_date, end_date)
 
     def set_start_end_date(self, start_date, end_date):
+        # Set the start date/end date based on the provided arguments and the date range type
         if self.date_range_type == "range-dates":
             self.start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
             self.end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
@@ -26,16 +27,20 @@ class DatesManager:
         self.calculate_number_of_days()
 
     def calculate_number_of_days(self):
+        # Calculates the number of days in the date range
         if self.start_date and self.end_date:
             self.number_of_days = (self.end_date - self.start_date).days
         else:
             self.number_of_days = 0
 
     def get_start_date(self):
+        # Returns the start date of the date range
         return self.start_date
     
     def get_end_date(self):
+        # Returns the end date of the date range
         return self.end_date
     
     def get_number_of_days(self):
+        # Returns the number of days in the date range
         return self.number_of_days
