@@ -249,6 +249,10 @@ They opt for buying a phone in one of the periods.
 ## IMAGES
 
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.37.png))
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.46.png)
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.53.png)
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.14.04.png)
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.14.16.png)
 
 
 
