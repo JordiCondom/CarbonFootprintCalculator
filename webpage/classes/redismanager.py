@@ -129,7 +129,6 @@ class RedisManager:
         # Check if a username already exists in Redis
 
         user_keys = self.r.keys("user:*")
-        print("hola")
         for key in user_keys:
             user_data = self.r.hgetall(key)
             current_username = user_data[b'username'].decode()

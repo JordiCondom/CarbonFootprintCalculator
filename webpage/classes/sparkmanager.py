@@ -114,7 +114,6 @@ class SparkManager:
             filled_dates_df = self.spark.createDataFrame(consecutive_date_pairs_filled, columns)
 
             num_partitions = 10
-            print('num_partitions: ', num_partitions)
 
             # Repartition the original DataFrame and the filled dates DataFrame
             df_partitioned = df.repartition(num_partitions, "start_date")
@@ -125,8 +124,6 @@ class SparkManager:
 
             # Order the rows by start_date
             ordered_df = joined_df.orderBy(F.col('start_date'))
-
-            print(ordered_df.show())
 
             return ordered_df
         
