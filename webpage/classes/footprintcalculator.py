@@ -13,6 +13,9 @@ class footprintCalculator:
         self.aluminium = 0
 
     def computeCarbonFootprint(self):
+        # Computes the overall carbon footprint based on various factors, including diet, transportation, housing,
+        # consumption, and waste.
+
         diet = self.computeDietCarbonFootprint()
         transportation =  self.computeTransportationCarbonFootprint()
         housing = self.computeHousingCarbonFootprint()
@@ -45,15 +48,18 @@ class footprintCalculator:
             'average_per_day': total/self.number_of_days,
             'total': total
         }
-
+        # Returns a dictionary with the carbon footprint details
         return carbonFootprint
     
     def computeDietCarbonFootprint(self):
+        # Computes the carbon footprint contribution from diet based on the selected diet type, local food consumption,
+        # and food waste percentage.
+
         diet = self.data['answerDiet']
         eatLocal = self.data['answerLocalFood']
         foodWastePercentage = int(self.data['answerWasteFoodPercentage'])
         
-        # kg/day
+        # Conversion factors (kg/day)
         diet_footprints = {
             'Vegan': 2.89,
             'Vegetarian': 3.81,
@@ -72,24 +78,29 @@ class footprintCalculator:
         # If you waste food, add the percentage of food you waste to the already existing carbon footprint
         value = value + (foodWastePercentage/100)*value
 
+        # Returns the calculated carbon footprint value
         return value * self.number_of_days
 
     def computeTransportationCarbonFootprint(self):
+        # Computes the carbon footprint contribution from transportation based on the combined values from car,
+        # bus/train, and plane carbon footprints.
         value = 0
         
         value = value + self.computeCarCarbonFootprint()
         value = value + self.computeBusTrainCarbonFootprint()
         value = value + self.computerPlaneCarbonFootprint()
-
+        # Returns the calculated carbon footprint value
         return value
 
     def computeCarCarbonFootprint(self):
+        # Computes the carbon footprint contribution from cars based on the selected car type and usage time.
+        # Returns the calculated carbon footprint value.
         value = 0
         if self.data['answerCarType'] and self.data['answerCarTime'] != '':
             carType = self.data['answerCarType']
             carTime = int(self.data['answerCarTime'])
             
-            #kgCo2/km
+            # Conversion factors kgCo2/km
             car_type_footprints = {
                 'Gasoline': 0.148,
                 'Diesel': 0.146,
@@ -99,14 +110,16 @@ class footprintCalculator:
             }
 
             value = car_type_footprints.get(carType, 0)
-            # 55 km/h on average
-            return value*carTime*55
-        
+            # Choice of 60 km/h on average
+            return value*carTime*60
         return value
 
     def computeBusTrainCarbonFootprint(self):
+        # Computes the carbon footprint contribution from bus/train transportation based on the selected time spent on
+        # city bus, intercity bus, and train.
         value = 0
 
+        # Conversion factors
         if self.data['answerCityBusTime']:
             # 0.03kgCo2/km , 22 km/h average
             value = value + 0.03*22*int(self.data['answerCityBusTime'])
@@ -119,9 +132,12 @@ class footprintCalculator:
             # 0.041kgCo2/km, 100 km/h average
             value = value + 0.041*100*int(self.data['answerTrainTime'])
 
+        # Returns the calculated carbon footprint value.
         return value
 
     def computerPlaneCarbonFootprint(self):
+        # Computes the carbon footprint contribution from plane travel information.
+
         value = 0
         if self.data['origin_airports'] != ['']:
             origin_airports = self.data['origin_airports']
@@ -135,22 +151,23 @@ class footprintCalculator:
                 current_destination_airport = destination_airports[i]
                 current_cabin_class = cabin_classes[i]
                 current_round_trip = round_trips[i] == "yes"
-
+                # Uses the AirportFootprintManager class to calculate the flight carbon footprint.
                 current_footprint = AirportFootprintManager().compute_flight_footprint(current_origin_airport,
                                                                                     current_destination_airport,
                                                                                     current_cabin_class,
                                                                                     current_round_trip)
-                
                 if current_footprint:
                     value = value + current_footprint
 
+        # Returns the calculated carbon footprint value.
         return value
 
     def computeHousingCarbonFootprint(self):
+        # Computes the carbon footprint contribution from housing based on the number of people and heating type.
         howmanypeople = self.data['answerHowManyPeople']
         heatingType = self.data['anwerHeatingType']
 
-        # Kwh_per_day
+        # (Kwh/day) consumption per number of household members
         number_of_people_Kwh_per_day = {
             '1': 4,
             '2': 6,
@@ -158,7 +175,7 @@ class footprintCalculator:
             '4': 9,
             '5more': 10
         }
-        # kgCo2/KwH
+        # Conversion Factor (kgCo2/Kwh)
         heating_type_footprints = {
             'electric': 0.34,
             'gas_methane': 0.18,
@@ -169,9 +186,12 @@ class footprintCalculator:
         }
 
         value = number_of_people_Kwh_per_day.get(howmanypeople, 0)*heating_type_footprints.get(heatingType, 0)
+
+        # Returns the calculated carbon footprint value.
         return value*self.number_of_days
 
     def computeConsumptionCarbonFootprint(self):
+        # Computes the carbon footprint contribution from consumption, including shopping profiles and electronics purchases.
 
         current_shopping_profile = self.data['answerShoppingProfile']
         EU_shopping_average_footprint = 2955*(1/365) # kg/day
@@ -208,10 +228,12 @@ class footprintCalculator:
             for product in current_electronics_buy:
                 shopping_footprint = shopping_footprint + electronics_footprint_factors.get(product,0)
 
-
+        # Returns the calculated carbon footprint value.
         return shopping_footprint
 
     def computeWasteCarbonFootprint(self):
+        # Computes the carbon footprint contribution from waste based on the selected waste materials and recycling status.
+
         value = 0
         waste_vector = self.data['anwerWasteMaterials']
         # Average kg waste generation per inhabitant in eu per day 
@@ -231,7 +253,7 @@ class footprintCalculator:
         if 'Aluminium' in waste_vector:
             self.aluminium = 1
 
-        # kgCo2/kg material
+        # Conversion factors not_recicled (kgCo2/kg material)
         GHG_of_materials_not_recicled = {
             'Plastic': 2.1,
             'Glass': 0.9,
@@ -239,7 +261,7 @@ class footprintCalculator:
             'Aluminium': 11.0
         }
 
-        # kgCo2/kg material
+        # Conversion factors recicled (kgCo2/kg material)
         GHG_of_materials_recicled = {
             'Plastic': 1.3,
             'Glass': 0.5,
@@ -253,5 +275,6 @@ class footprintCalculator:
             else: #not recycled
                 value = value + GHG_of_materials_not_recicled[material]*average_kg_waste_generation_per_day[material]
 
+        # Returns the calculated carbon footprint value
         return value*self.number_of_days
     
