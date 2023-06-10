@@ -2,7 +2,7 @@
 Carbon Footprint Calculator for Big Data Technologies course of University of Trento
 
 # Project description
-Carbon Footprint Calculator: In this project, your task will involve developing a platform that **calculates individual carbon footprints** based on **user input** regarding lifestyle habits, transportation choices, dietary preferences, waste production and consumption patterns. The system should allow users to **track** and **compare** their annual emissions against **national averages** and **global targets**. Additionally, it could include features such as **personalised suggestions** on reducing greenhouse gas emissions and displaying potential offsets through purchases of renewable energy certificates or planted trees. 
+Carbon Footprint Calculator: In this project, your task will involve developing a platform that **calculates individual carbon footprints** based on **user input** regarding lifestyle habits, transportation choices, dietary preferences, waste production and consumption patterns. The system should allow users to **track** and **compare** their annual emissions against **national averages** and **global targets**. Additionally, it could include features such as **personalized suggestions** on reducing greenhouse gas emissions and displaying potential offsets through purchases of renewable energy certificates or planted trees. 
 
 # Conversion Factors
 The following section highlights the conversion factors and choices adopted in the project. A “conversion factor”, in the context of a carbon footprint calculator, is the fundamental tool used to convert habits into kg of CO2e. The computation of those factors has been extracted from various sources and, when possible, double-checked to ensure scientific accuracy. The issues and limitations of those sources will be later discussed.
@@ -11,7 +11,7 @@ The following section highlights the conversion factors and choices adopted in t
 ### Diet
 Following the decision made by GoClimate Calculator[^1], we have based the categories and values for the users diet from a study by Scarborough et al (2014)[^2]:
 	
-| **Diet**                    | **Kg CO2e/day** |
+| **Diet**                    | **kg CO2e/day** |
 |-----------------------------|-----------------|
 | Vegan                       | 2,89            |
 | Vegetarian                  | 3,81            |
@@ -30,18 +30,29 @@ Buying local food products, often from the city street markets, essentially mean
 So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
 
 ## Transportation
+We accounted for transportation emissions referencing the website Ourworldindata[^4] for the public services like trains and buses, and private cars. To make the questionnaire user-friendly we decided to ask for the time spent in the mean of transportation instead of the actual kilometers traveled (_seriously… who could answer that?_). Unfortunately, as someone once said “To obtain, something of equal value must be lost”[^5] and to obtain an answerable question, here we made the assumption about the average driving speed, generalized for both city and countryside streets. 
+For the cars, we accounted for the engine type following GoClimate report[^1] and determined an average speed of 60 km/h:
 
-### Local food
-Buying local food products, often from the city street markets, essentially means to avoid two aspects of the retail industry: transportation and packaging. In the literature[^3] it is said that:
-> [...] the sum of emissions from packaging, transport, and retail contributes just 1 to 9%.
+| **Engine**      | **kgCO2e/km**    | **kg/hours (60 km/h)** |
+|-----------|----------|------------------|
+| Gasoline  | 0.148    | 8.88             |
+| Diesel    | 0.146    | 8.76             |
+| Hybrid    | 0.049    | 2.94             |
+| Electric  | 0.005    | 0.3              |
+| No Car    | 0        | 0                |
 
-So we decided to reduce the user’s emissions by an average of 5% if they consistently buy local products.
+While for public transportation we extracted an online emission calculator [^7] accounting for both city/countryside buses and normal/high speed trains velocities:
+|             | CO2e kg/km | avg speed km/h | CO2e kg/h |
+|-------------|------------|----------------|-----------|
+| city bus    | 0.03       | 22             | 0.66      |
+| intercity bus | 0.03       | 80             | 2.4       |
+| high speed train | 0.04       | 200            | 8         |
+| normal speed train | 0.04       | 100            | 4         |
 
-## Transportation
-We accounted for transportation emissions referencing the website Ourworldindata[^4] for the public services like trains and buses, and private cars. To make the questionnaire user-friendly we decided to ask for the time spent in the mean of transportation instead of the actual kilometers traveled (_seriously… who could answer that?_). Unfortunately, as someone once said “To obtain, something of equal value must be lost”[^5] and to obtain an answerable question, here we made the assumption about the average driving speed, generalized for both city and countryside streets.
 Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^6].
 
 ## Housing
+
 
 ## Consumption
 
@@ -66,5 +77,7 @@ As a result of the mentioned issues, the computations offered by the calculator 
 [^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
 
 [^5]: A. Elric “等価交換” https://www.youtube.com/watch?v=8nm4chD_-Mg
+
 [^6]: GoClimate API Reference https://api.goclimate.com/docs
 
+[^7] https://www.carbonfootprint.com/calculator.aspx
