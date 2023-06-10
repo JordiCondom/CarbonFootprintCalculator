@@ -1,10 +1,12 @@
 import random
 
+
 class RecommendationsManager:
     def __init__(self, data):
         self.data = data
         self.recommendations_list = []
 
+    # Generate recommendations based on carbon footprint data
     def generate_recommendations(self, number_of_rows):
         if self.data['diet']/self.data['number_of_days'] > 4.6:
             self.recommendations_list.append("Diet: With a little change in your diet you can drastically lower your carbon footprint, if you decide to reduce your consumption of meat to just one steak (350g) instead of two each week you can save 35% with respect to eating 2!")

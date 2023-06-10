@@ -59,7 +59,7 @@ class footprintCalculator:
         eatLocal = self.data['answerLocalFood']
         foodWastePercentage = int(self.data['answerWasteFoodPercentage'])
         
-        # Conversion factors (kg/day)
+        # Conversion factors (kgCO2/day)
         diet_footprints = {
             'Vegan': 2.89,
             'Vegetarian': 3.81,
@@ -213,7 +213,7 @@ class footprintCalculator:
 
         if self.data['answerPhoneLaptop']:
             current_electronics_buy = self.data['answerPhoneLaptop']
-            electronics_footprint_factors = {
+            electronics_footprint_factors = { #kg CO2
                 'phone': 70,
                 'refurbishedphone': 7,
                 'laptop': 300,

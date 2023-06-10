@@ -11,7 +11,7 @@ practices.
 
 # **Execution**
 
-As a first step, we have to set up the technologies with docker. In this case, worker refers to the ammount of workers Citus users for PostgreSQL, 2 by default. Important to notice ports 5432 and 6379 must be free of use before running Docker. Also, internet access is required as the javascript of the frontend imports some code from the internet.
+As a first step, we have to set up the technologies with docker. In this case, worker refers to the ammount of workers Citus users for PostgreSQL, 2 by default. Important to notice ports 5432 and 6379 must be free of use before running Docker. Also, internet access is required as the javascript of the frontend imports some code from the internet. All of the required files for the following executions are in the webpage folder.
 ```
 docker-compose -p citus up --scale worker=2
 ```

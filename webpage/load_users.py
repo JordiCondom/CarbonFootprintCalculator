@@ -8,7 +8,7 @@ from classes.redismanager import RedisManager
 
 user_files = ["vegan", "mixed_diet", "low_meat_eater", "pescetarian", "heavy_consumer", "average_consumer", "average_consumer_plus_plane", "random"]
 
-postgresql_manager = PostgreSQLManager('0.0.0.0',5858, 'docker', 'docker', 'mydatabase')
+postgresql_manager = PostgreSQLManager('0.0.0.0',5432, 'docker', 'docker', 'mydatabase')
 redis_manager = RedisManager('localhost', 6379, 2)
 redis_manager_1 = RedisManager('localhost', 6379, 1)
 
