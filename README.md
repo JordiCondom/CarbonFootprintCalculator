@@ -33,7 +33,7 @@ The following section highlights the conversion factors and choices adopted in t
 
 ## Food section
 ### Diet
-Following the decision made by GoClimate Calculator[^1], we have based the categories and values for the users diet from a study by Scarborough et al (2014)[^2]:
+Following the factors by GoClimate Calculator[^1], we have based the categories and values for the users diet from a study by Scarborough et al (2014)[^2]:
 	
 | **Diet**                    | **kg CO2e/day** |
 |-----------------------------|-----------------|
@@ -97,7 +97,7 @@ While the average kWh consumption per Household size is:
 
 
 ## Waste
-Computing waste emissions was quite challenging as we had to take a long path to assess municipal waste weight[^8] and composition[^9] in Europe. Then we referred to the specific material-industry sector reports to assess the impact of production/recycling/landfilling of the materials. When the data conversion was too complex (_preatty often_) we resorted to the production emissions, mainly because some materials produced more greenhouse gasses if they were recycled with respect to thrown in a landfill. Production emissions were instead a reliable indicator for all materials. The conversion factors used are as follows:
+Computing waste emissions was quite challenging as we had to take a long path to assess municipal waste weight[^8] and composition[^9] in Europe. In addition, we referred to how much kg CO2 a recycled and not recycled material imply[^13]. The conversion factors used are as follows:
 | Material        | avg % in Municipal Waste (Europe) |
 |-----------------|----------------------------------|
 | Plastic         | 10.00%                           |
@@ -107,7 +107,7 @@ Computing waste emissions was quite challenging as we had to take a long path to
 | Ferrous Metals  | 2.00%                            | 
 
 
-| Material  | GHG From New Production (CO2e/kg) | GHG From Producing Recycled Materials (CO2e/kg) |
+| Material  | GHG From New Production (kg CO2e/kg) | GHG From Producing Recycled Materials (kg CO2e/kg) |
 |-----------|----------------------------------|------------------------------------------------|
 | Aluminum  | 11.0                             | 0.4                                            |
 | Glass     | 0.9                              | 0.5                                            |
@@ -169,6 +169,8 @@ Last but not least, for the generic consumption emission assessment, we decided 
 
 [^12]: [Tech (Website)](https://www.goclimate.com/blog/the-carbon-footprint-of-shopping/) – 
 [Tech refurbished (Website)](https://impakter.com/by-buying-your-smartphone-refurbished-rather-than-new-you-can-save-over-77kg-of-co2) 
+
+[^13]: [Carbon Footprint: Recycling Compared to Not Recycling](https://8billiontrees.com/carbon-offsets-credits/carbon-footprint-recycling/)
 
 
 

@@ -25,8 +25,7 @@ if os.path.exists(session_cookie_path):
 with open('./co2EmissionsCountry.json', 'r') as f:
     co2EmissionsCountry = json.load(f)
 
-annual_average_in_tons = 0
-df_pandas = None
+
 
 app = Flask(__name__, template_folder='./html_files')
 
@@ -46,6 +45,8 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SECRET_KEY'] = os.urandom(24)
+annual_average_in_tons = 0
+df_pandas = None
 
 # Main page: if user connected you go to dashboard, otherwise go to login
 @app.route('/')
@@ -56,6 +57,7 @@ def index():
         session.pop('username', None)
         return redirect('/login')
 
+# Update Horizontal Bar Chart
 @app.route('/callback', methods=['POST', 'GET'])
 def cb():
     country = request.args.get('data')
@@ -146,7 +148,7 @@ def input_data():
         # save dates in redis for further checks
         redis_manager.store_date_range(username, start_date, end_date)
             
-        
+        # Collect data of the survery so it can be input in PostgreSQL
         response_data = {
             'start_date': start_date,
             'end_date': end_date,
@@ -175,9 +177,10 @@ def input_data():
             'answerPhoneLaptop': request.form.getlist('phoneLaptopQuestion[]'),
         }
 
-        # Create answers database to save the answers
+        # Create answers database (if does not exist) to save the answers
         table_name_answers = f'user_{username}_answers'
         
+        # Define columns and types
         columns = [
             'start_date DATE',
             'end_date DATE',
@@ -209,7 +212,7 @@ def input_data():
         postgresql_manager.create_table(table_name_answers, columns)
         postgresql_manager.insert_data(table_name_answers, response_data)
 
-        # Create carbon footprint database to save carbon footprint data
+        # Create carbon footprint database (if does not exist) to save carbon footprint data
         carbon_footprint_manager = footprintCalculator(response_data)
         carbon_footprint = carbon_footprint_manager.computeCarbonFootprint()
 
@@ -265,12 +268,11 @@ def track_data():
     from_date, to_date, df = spark_manager.loadDF_with_tablename(table_name_carbon)
     # Fill data of missing dates in between the dates available
     df = spark_manager.fill_df(df)
-    # Compute the sum of each column
 
     columns_to_sum = ["total", "diet", "transportation", "housing", "consumption", "waste", "car", "bustrain", "plane", "shopping_profile",
                       "refurbished", "plastic", "glass", "paper", "aluminium", "number_of_days"]
     
-    # Compute the sum of the specified columns and turn them into a dictionary
+    # Compute the sum of the specified columns and turn them into a dictionary for further processing
     column_sums = df.select(*columns_to_sum).agg(*[F.sum(col).alias(col) for col in columns_to_sum])
     column_sums_dict = column_sums.first().asDict()
 
@@ -298,7 +300,7 @@ def track_data():
     max_end_date = df.select(F.max("end_date")).first()[0]
     number_of_days = (max_end_date - min_start_date).days
     global time_dates
-    time_dates = pd.date_range(start=min_start_date, end=max_end_date)
+    time_dates = pd.date_range(start=min_start_date, end=max_end_date) # all days to plot
 
     total_sum = column_sums_dict['total']
     global annual_average_in_tons
@@ -316,6 +318,7 @@ def track_data():
 
     new_df = local_df_pandas.copy()
 
+    # Process to create dataframe where each row is a day of input data and the respective averaged value
     # Initialize an empty list to store the exploded rows
     exploded_rows = []
 
@@ -355,6 +358,7 @@ def track_data():
                            recommendations_vector=recommendations_vector,
                            pie_graph_data_2_trees=pie_graph_data_2_trees)
 
+# Delete connected user data
 @app.route('/deleteUserData', methods=['GET', 'POST'])
 def delete_user_date():
     username = session['username']
@@ -370,12 +374,14 @@ def delete_user_date():
 
     return render_template('dashboard.html', username=session['username'])
 
+# Callback to update plot to track data in time
 @app.route('/callbackTime', methods=['POST', 'GET'])
 def callback_time():
     data_to_show = request.args.getlist('data')
     data_to_show = data_to_show[0].split(',')
     return time_graph(data_to_show)
 
+# Create plot to track data in time
 def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "total"]):
     if y == ['']:
         # Return an empty plot
@@ -403,7 +409,7 @@ def time_graph(y=["diet", "transportation", "housing", "consumption", "waste", "
         
     return timegraphJSON
 
-
+# Create horizontal barchart
 def gm(country='Afghanistan'):
     global_average = 4.8
     country_values = co2EmissionsCountry
@@ -450,7 +456,7 @@ def gm(country='Afghanistan'):
     
     return graphJSON
 
-
+# logout
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # Remove the 'username' key from the session
