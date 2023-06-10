@@ -98,13 +98,22 @@ While the average kWh consumption per Household size is:
 
 ## Waste
 Computing waste emissions was quite challenging as we had to take a long path to assess municipal waste weight[^8] and composition[^9] in Europe. Then we referred to the specific material-industry sector reports to assess the impact of production/recycling/landfilling of the materials. When the data conversion was too complex (_preatty often_) we resorted to the production emissions, mainly because some materials produced more greenhouse gasses if they were recycled with respect to thrown in a landfill. Production emissions were instead a reliable indicator for all materials. The conversion factors used are as follows:
-| Material        | avg % in Municipal Waste (Europe) | kgCO2e/kg[^10] |
-|-----------------|----------------------------------|-----------|
-| Plastic         | 10.00%                           | 2.7       |
-| Paper           | 30.00%                           | 0.13      |
-| Glass           | 7.50%                            | 0.6       |
-| Non Ferrous     | 5.00%                            | 0.392     |
-| Ferrous Metals  | 2.00%                            | 2.7       |
+| Material        | avg % in Municipal Waste (Europe) |
+|-----------------|----------------------------------|
+| Plastic         | 10.00%                           |
+| Paper           | 30.00%                           |
+| Glass           | 7.50%                            |
+| Non Ferrous     | 5.00%                            |
+| Ferrous Metals  | 2.00%                            | 
+
+
+| Material  | GHG From New Production (CO2e/kg) | GHG From Producing Recycled Materials (CO2e/kg) |
+|-----------|----------------------------------|------------------------------------------------|
+| Aluminum  | 11.0                             | 0.4                                            |
+| Glass     | 0.9                              | 0.5                                            |
+| Plastic   | 2.1                              | 1.3                                            |
+| Paper     | 1.1                              | 0.7                                            |
+
 
 
 ## Consumption
