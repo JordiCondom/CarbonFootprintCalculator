@@ -187,7 +187,6 @@ They have a high shopping profile.
 They opt for buying a laptop in one of the periods.
 
 average_consumer:
-
 Data is each 2 months starting January first 
 They follow a regular meat diet.
 They waste an average of 5-10% of their food.
@@ -203,7 +202,6 @@ They opt for buying a phone in one of the periods.
 
 
 mixed_diet:
-
 Data is each 2 months starting January first 
 They follow a regular meat or vegetarian diet.
 They waste an average of 6-18% of their food.
@@ -218,8 +216,6 @@ They have an average shopping profile.
 They opt for buying a phone in one of the periods.
 
 random:
-
-summary: 
 Data is each 2 months starting January first 
 They follow a heavy meat diet.
 They waste an average of 18-20% of their food.
@@ -235,7 +231,6 @@ They opt for buying a phone in one of the periods.
 
 
 average_consumer_plus_plane
-
 Data is each 2 months starting January first 
 They follow a regular meat diet.
 They waste an average of 5-10% of their food.
