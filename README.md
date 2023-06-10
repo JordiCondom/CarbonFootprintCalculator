@@ -23,13 +23,137 @@ To run the website server locally, open a new shell and execute:
 ```
 python3 ./app.py
 ```
-At this point you can upload some test users using (Required Docker running):
+The local server is now running at: http://127.0.0.1:5000. At this point you can upload some test users using (Required Docker running):
 ```
 pyhton3 ./load_user.py 
 ```
 
 # Data Pipeline
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/datapipeline.png)
+
+# Test Users descriptions
+
+After loading the users, you can login using the username and the password (same username) to see some test data. These are the following:
+
+vegan:
+Data is each 2 months starting January first 
+Follows follow a vegan diet.
+Wastes an average of 10-14% of their food.
+Prioritizes consuming local food.
+Does not use a car 
+Only uses city buses for 60-40 hours.
+Lives in a household of three people.
+The type of heating in their home is unknown.
+Recycles glass, plastic, paper, and aluminum.
+Has an average shopping profile.
+Opts for buying a refurbished phone in the last period
+
+pescatarian:
+Data is each 2 months starting January first 
+Follows a pescetarian diet.
+Wastes an average of 5-10% of their food.
+Prioritizes consuming local food.
+Does not use a car 
+Only uses city buses for 20-35 hours.
+No data regarding flights
+Lives in a household of four people.
+Uses LPG as the heating type in their home.
+Recycles glass, plastic, paper, and aluminum.
+Has a low shopping profile.
+Opts for buying a refurbished phone in the last period.
+
+
+low_meat_eater:
+Data is each 2 months starting January first 
+Follows a diet that includes some meat.
+Wastes an average of 7-20% of their food.
+Prioritizes consuming local food.
+Uses a plug-in hybrid electric car and spend 15-20 hours on car travel.
+Uses trains 6 to 3 hours.
+No data regarding flights
+Lives in a household of one person.
+The type of heating in their home is unknown.
+Does not recycle.
+Has a low shopping profile.
+Opts for buying a phone or laptop in different periods.
+
+
+heavy_consumer:
+Data is each 2 months starting January first 
+Follows a diet that includes heavy meat consumption.
+Wastes an average of 10-15% of their food.
+Does not prioritize consuming local food.
+Uses a gasoline car and spend 40-60 hours on car travel.
+Uses trains for 2 to 5 hours.
+No data regarding flights
+Lives in a household of one person.
+Uses gas methane as the heating type in their home.
+Does not recycle.
+Has a high shopping profile.
+Opts for buying a laptop in one of the periods.
+
+average_consumer:
+
+Data is each 2 months starting January first 
+Follows a regular meat diet.
+Wastes an average of 5-10% of their food.
+Prioritizes consuming local food.
+Uses a diesel car and spend 5 hours on car travel.
+Also usees city buses, intercity buses, and trains, spending 10-15 hours on each mode of transportation.
+No data regarding flights
+Lives in a household of three people.
+Uses gas methane as the heating type in their home.
+Recycles glass, plastic, paper, and aluminum.
+Has an average shopping profile.
+Opts for buying a phone in one of the periods.
+
+
+mixed_diet:
+
+Data is each 2 months starting January first 
+Follows a regular meat or vegetarian diet.
+Wastes an average of 6-18% of their food.
+They sometimes consume local food but not always.
+Uses a diesel car and spend 3-10 hours on car travel.
+Also usees city buses, intercity buses, and trains, spending 7-13 hours on each mode of transportation.
+No data regarding flights
+Lives in a household of three people.
+Uses gas methane as the heating type in their home.
+Recycles glass, plastic, paper, and aluminum.
+Has an average shopping profile.
+Opts for buying a phone in one of the periods.
+
+random:
+
+summary: 
+Data is each 2 months starting January first 
+Follows a heavy meat diet.
+Wastes an average of 18-20% of their food.
+Prioritizes consuming local food.
+Uses an electric car and spend 25-30 hours on car travel.
+Uses city buses, and trains sometimes.
+No data regarding flights
+Lives in a household of three people.
+The type of heating in their home is unknown.
+Recycles glass, plastic, paper, and aluminum.
+Has an average shopping profile.
+Opts for buying a phone in one of the periods.
+
+
+average_consumer_plus_plane
+
+Data is each 2 months starting January first 
+Follows a regular meat diet.
+Wastes an average of 5-10% of their food.
+Prioritizes consuming local food.
+Uses a diesel car and spend 5 hours on car travel.
+Also usees city buses, intercity buses, and trains, spending 10-15 hours on each mode of transportation.
+Took a flight from LA to NY and back in business class
+Lives in a household of three people.
+Uses gas methane as the heating type in their home.
+Recycles glass, plastic, paper, and aluminum.
+Has an average shopping profile.
+Opts for buying a phone in one of the periods.
 
 # Conversion Factors for the Calculator
 The following section highlights the conversion factors and choices adopted in the project. A “conversion factor”, in the context of a carbon footprint calculator, is the fundamental tool used to convert habits into kg of CO2e. The computation of those factors has been extracted from various sources and, when possible, double-checked to ensure scientific accuracy. The issues and limitations of those sources will be later discussed.
