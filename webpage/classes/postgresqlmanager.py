@@ -12,7 +12,7 @@ class PostgreSQLManager:
         self.conn = psycopg2.connect(
             host="0.0.0.0",
             user="docker",
-            port=5433,
+            port=5432,
             password="docker",
             database="mydatabase"
         )
