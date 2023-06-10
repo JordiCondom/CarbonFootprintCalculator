@@ -37,6 +37,8 @@ class PostgreSQLManager:
             return user_data
     
     def create_table(self, table_name, columns):
+        # Creates a new table with the given name and columns.
+        # Executes a CREATE TABLE query using the provided table name and column definitions.
         with self.conn.cursor() as cursor:
             column_definitions = ', '.join(columns)
             create_table_query = sql.SQL("""
@@ -51,7 +53,10 @@ class PostgreSQLManager:
         self.conn.commit()
 
     def check_table_exists(self, table_name):
-        
+        # Checks if the specified table exists in the database.
+        # Executes SQL queries to check the existence of the table
+        # and retrieve its column names if it exists
+
         exists = False
         columns = []
 
@@ -68,8 +73,12 @@ class PostgreSQLManager:
         return exists, columns
 
     def insert_data(self, table_name, response_data):
+        # Inserts data into the specified table.
+        # Extracts the column names from the provided response_data dictionary
+
         input_data_columns = [key.lower() for key in response_data.keys()]
         input_data_values = list(response_data.values())
+        # Executes an INSERT INTO query to insert the data into the table.
 
         with self.conn.cursor() as cursor:
             placeholders = ', '.join(['%s'] * len(input_data_columns))
@@ -86,7 +95,11 @@ class PostgreSQLManager:
         self.conn.commit()
 
     def get_data_from_date_range(self, table_name, from_date, to_date):
+        # Retrieves data from the specified table within a given date range
         with self.conn.cursor() as cursor:
+            # Executes a SELECT query with a WHERE clause to
+            # filter rows based on the start_date and end_date columns
+
             select_query = sql.SQL("""
                 SELECT * FROM {table_name}
                 WHERE start_date >= {from_date} AND end_date <= {to_date}
@@ -102,7 +115,11 @@ class PostgreSQLManager:
         
 
     def delete_table_sample_by_dates(self, table_name, start_date, end_date):
+        # Deletes rows from the specified table that match the provided start_date and end_date
+
         with self.conn.cursor() as cursor:
+            # Executes a DELETE FROM query with a WHERE clause to delete the matching rows.
+
             delete_query = sql.SQL("""
                 DELETE FROM {table_name}
                 WHERE start_date = {start} AND end_date = {end}
@@ -115,6 +132,8 @@ class PostgreSQLManager:
         self.conn.commit()
 
     def delete_all_table_data(self, table_name):
+        # Deletes all data from the specified table
+        
         with self.conn.cursor() as cursor:
             # Delete all data from the table
             delete_query = sql.SQL("DELETE FROM {table_name}").format(table_name=sql.Identifier(table_name))
