@@ -73,7 +73,6 @@ While for public transportation we extracted an online emission calculator [^7] 
 |-------------|------------|----------------|-----------|
 | city bus    | 0.03       | 22             | 0.66      |
 | intercity bus | 0.03       | 80             | 2.4       |
-| high speed train | 0.04       | 200            | 8         |
 | normal speed train | 0.04       | 100            | 4         |
 
 Flights emissions are instead implemented thanks to the REST API of GoClimate lifestyle calculator[^6].
@@ -112,10 +111,10 @@ Computing waste emissions was quite challenging as we had to take a long path to
 
 
 ## Consumption
-Last but not least, for the generic consumption emission assessment, we decided to focus on clothing[^11] and technological[^12] expenditure:
-|          | kgCO2e | kg fibers per capita| kgCO2/kg fibers |
+Last but not least, for the generic consumption emission assessment, we decided to focus on shopping profile[^11] and technological[^12] expenditure:
+|          | High Shopping Profile | Average Shopping Profile | Low Shopping Profile |
 |----------|-------|------------|----------------|
-| UE       | 1210  | 31.21      | 38.77          |
+| kg CO2 per day       | 12.14  | 8.09      | 4.04         |
 
 |            | kg CO2e | refurbished (=10%) |
 |------------|---------|------------------|
@@ -123,9 +122,9 @@ Last but not least, for the generic consumption emission assessment, we decided 
 | Laptop     | 300     | 30               |
 
 
-## IMAGES
+## Tracking Data Plots examples:
 
-![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.37.png))
+![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.37.png)
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.46.png)
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.13.53.png)
 ![alt text](https://raw.githubusercontent.com/JordiCondom/CarbonFootprintCalculator/main/Images/Screenshot%202023-06-10%20alle%2017.14.04.png)
@@ -160,7 +159,7 @@ Last but not least, for the generic consumption emission assessment, we decided 
 [Aluminum emissions (Aluminum industry sector report - page 13)](https://climate.ec.europa.eu/system/files/2016-11/bm_study-aluminium_en.pdf) – 
 [Steel emissions (Website)](https://www.sustainable-ships.org/stories/2022/carbon-footprint-steel)
 
-[^11]: [Clothes emissions (Global apparel/footwear industries report - page 19)](https://quantis.com/wp-content/uploads/2018/03/measuringfashion_globalimpactstudy_full-report_quantis_cwf_2018a.pdf)
+[^11]: [GoClimate: Methodology behind the carbon footprint calculator](https://www.goclimate.com/blog/methodology-behind-the-carbon-footprint-calculator/)
 
 [^12]: [Tech (Website)](https://www.goclimate.com/blog/the-carbon-footprint-of-shopping/) – 
 [Tech refurbished (Website)](https://impakter.com/by-buying-your-smartphone-refurbished-rather-than-new-you-can-save-over-77kg-of-co2) 
