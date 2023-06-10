@@ -133,7 +133,7 @@ class PostgreSQLManager:
 
     def delete_all_table_data(self, table_name):
         # Deletes all data from the specified table
-        
+
         with self.conn.cursor() as cursor:
             # Delete all data from the table
             delete_query = sql.SQL("DELETE FROM {table_name}").format(table_name=sql.Identifier(table_name))
