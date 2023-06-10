@@ -246,7 +246,9 @@ They opt for buying a phone in one of the periods.
 
 
 
+## IMAGES
 
+![alt text](https://imgur.com/a/qCtxGmT)
 
 
 
