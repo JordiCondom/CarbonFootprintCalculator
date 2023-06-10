@@ -1,20 +1,17 @@
 # Carbon Footprint Calculator
-This project develops a carbon footprint questionnaire, calcu-
-lator, and tracking system using big data technologies taught
+This project develops a carbon footprint questionnaire, calculator, and tracking system using big data technologies taught
 in the Big Data Technologies course at the University of
 Trento. The questionnaire assesses carbon emissions across
 various activities, while the calculator generates accurate
 estimations. Real-time data tracking enables personalized
 recommendations to reduce carbon footprints, and carbon
-offsetting recommendations support environmental mitiga-
-tion. The project offers a comprehensive solution for assess-
-ing, managing, and mitigating carbon footprints, applying big
+offsetting recommendations support environmental mitigation. The project offers a comprehensive solution for assessing, managing, and mitigating carbon footprints, applying big
 data technologies to promote sustainability and eco-friendly
 practices.
 
 # **Execution**
 
-As a first step, we have to set up the technologies with docker. In this case, worker refers to the ammount of workers Citus users for PostgreSQL, 2 by default:
+As a first step, we have to set up the technologies with docker. In this case, worker refers to the ammount of workers Citus users for PostgreSQL, 2 by default. Important to notice ports 5432 and 6379 must be free of use before running Docker.
 ```
 docker-compose -p citus up --scale worker=2
 ```
