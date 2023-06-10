@@ -5,7 +5,13 @@ class SparkManager:
     def __init__(self, spark):
         self.spark = spark
 
+''' JDBC stands for Java Database Connectivity. It is a Java API (Application Programming Interface) 
+that allows Java programs to interact with relational databases. JDBC provides a set of classes and methods that
+enable database operations such as connecting to a database, executing SQL queries, and retrieving and manipulating data '''
+
     def loadDF_with_tablename(self, table_name):
+        # Load a DataFrame from a PostgreSQL table using JDBC
+
         jdbc_url = "jdbc:postgresql://0.0.0.0:5432/mydatabase"
 
         df = self.spark.read.format("jdbc").option("url", jdbc_url) \
@@ -20,6 +26,8 @@ class SparkManager:
     
 
     def fill_df(self, df):
+        # Fill missing dates in a DataFrame with computed average values
+
         sum_days = df.select(F.sum('number_of_days')).first()[0]
         n_rows = df.count()
 
@@ -56,8 +64,10 @@ class SparkManager:
         average_paper = average_row['average_paper']
         average_aluminium = average_row['average_aluminium']
 
-        date_columns = df.select("start_date", "end_date")
+        # Convert the date columns to a Pandas DataFrame
+        # Create a list of date pairs from the Pandas DataFrame
 
+        date_columns = df.select("start_date", "end_date")
         date_columns = date_columns.toPandas()
 
         # Create a list of date pairs from the Pandas DataFrame
@@ -91,19 +101,25 @@ class SparkManager:
                 total = diet + transportation + housing + consumption + waste
                 plane = 0
                 average_per_day = total/number_of_days
+
+                # Append the filled date pair to the result list
                 consecutive_date_pairs_filled.append((start_date, end_date, diet, transportation, car, bustrain, plane, housing, consumption, 
                                                       shopping_profile,refurbished,waste,plastic,glass,paper, aluminium,number_of_days, average_per_day, total))
-
+            # Set the start_date and end_date for the next iteration
             start_date, end_date = next_start_date, next_end_date
 
+        # Define the column names for the filled dates DataFrame
         columns = ['start_date', 'end_date', 'diet', 'transportation', 'car', 'bustrain', 'plane', 'housing', 'consumption',
                    'shopping_profile', 'refurbished', 'waste', 'plastic', 'glass', 'paper', 'aluminium' 'number_of_days', 'average_per_day', 'total']
 
         if consecutive_date_pairs_filled:
+            # Create a DataFrame from the filled consecutive date pairs
             filled_dates_df = self.spark.createDataFrame(consecutive_date_pairs_filled, columns)
 
             num_partitions = 30
             print('num_partitions: ', num_partitions)
+
+            # Repartition the original DataFrame and the filled dates DataFrame
             df_partitioned = df.repartition(num_partitions, "start_date")
             filled_dates_partitioned = filled_dates_df.repartition(num_partitions, "start_date")
 
@@ -117,7 +133,8 @@ class SparkManager:
 
             return ordered_df
         
-        else: 
+        else:
+            # If there are no consecutive date pairs to fill, return the original DataFrame
             return df
 
         
