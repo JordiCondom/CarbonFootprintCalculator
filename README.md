@@ -125,7 +125,7 @@ As mentioned above, in the retrieval of the conversion factors we encountered a 
 As a result of the mentioned issues, the computations offered by the calculator are the best approximation we could reach, but an approximation nonetheless.
 
 
-## **Users description
+## Users description
 
 After loading the users, you can login using the username also as a password to see some test data. These are the following:
 
