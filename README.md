@@ -1,6 +1,29 @@
 # CarbonFootprintCalculator
 Carbon Footprint Calculator for Big Data Technologies course of University of Trento
 
+# **How to run**
+
+The project comes with a dockerfile 
+
+docker-compose -p citus up --scale worker=2
+
+At this point you should have interactive access to the docker container. To run the other stacks you need, open a new shell and:
+
+```
+python3 ./app.py
+```
+
+At this point you can upload some test user using 
+
+```
+pyhton3 ./load_user.py 
+```
+You can installing dependencies on your machine through
+
+```
+pip install -r requirements.txt 
+```
+
 # Project description
 Carbon Footprint Calculator: In this project, your task will involve developing a platform that **calculates individual carbon footprints** based on **user input** regarding lifestyle habits, transportation choices, dietary preferences, waste production and consumption patterns. The system should allow users to **track** and **compare** their annual emissions against **national averages** and **global targets**. Additionally, it could include features such as **personalized suggestions** on reducing greenhouse gas emissions and displaying potential offsets through purchases of renewable energy certificates or planted trees. 
 
