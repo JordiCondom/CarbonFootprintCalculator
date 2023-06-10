@@ -149,15 +149,15 @@ Last but not least, for the generic consumption emission assessment, we decided 
 
 [^4]: Our World in Data website, "Carbon footprint of travel per kilometer, 2018" https://ourworldindata.org/travel-carbon-footprint 
 
-[^5]: [A. Elric “等価交換”] (https://www.youtube.com/watch?v=8nm4chD_-Mg)
+[^5]: [A. Elric “等価交換”](https://www.youtube.com/watch?v=8nm4chD_-Mg) 
 
 [^6]: GoClimate API Reference https://api.goclimate.com/docs
 
-[^7]: https://www.carbonfootprint.com/calculator.aspx
+[^7]: [Carbon Footprint calculator](https://www.carbonfootprint.com/calculator.aspx)
 
 [^8]: Average Municipal waste in EU 2021 https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Municipal_waste_statistics
 
-[^9]: Waste composition % in EUhttps://www.researchgate.net/publication/225979972_Separate_collection_and_biological_waste_treatment_in_the_European_Community
+[^9]: Waste composition % in EU https://www.researchgate.net/publication/225979972_Separate_collection_and_biological_waste_treatment_in_the_European_Community
 
 [^10]: [Plastic emissions (Paper - page 13)](https://www.eionet.europa.eu/etcs/etc-wmge/products/etc-wmge-reports/greenhouse-gas-emissions-and-natural-capital-implications-of-plastics-including-biobased-plastics/@@download/file/ETC_2.1.2.1._GHGEmissionsOfPlastics_FinalReport_v7.0_ED.pdf) – 
 [Paper emissions (Website)](https://www.holmen.com/en/paper/sustainability/sustainability-stories/how-to-undrestand-carbon-footprints/) – 
