@@ -6,7 +6,7 @@ class graphCreator:
         pass
 
     def create_pie_chart(self, pie_labels,pie_variable_values):
-
+        # Creates a pie chart with the provided labels and variable values.
         total_co2 = int(sum(pie_variable_values))
         pie_variable_values_in_tones = ["{:.2f}".format(value / 1000) for value in pie_variable_values]
 
@@ -30,9 +30,12 @@ class graphCreator:
 
         # Convert the figure to a JSON string
         pie_graph_data = piefig.to_json()
+
+        #Returns the JSON data representation of the pie chart
         return pie_graph_data
     
     def create_pie_chart_trees(self, pie_labels, pie_variable_values):
+        # Creates a pie chart with the provided labels and variable values, where values represent CO2 emissions in tones.
 
         # 31 to 46 trees for tone/CO2
         total_co2 = int(sum(pie_variable_values)*38/1000)
@@ -59,10 +62,13 @@ class graphCreator:
 
         # Convert the figure to a JSON string
         pie_graph_data = piefig.to_json()
+
+        # Returns the JSON data representation of the pie chart.
         return pie_graph_data
     
     def create_sun_chart(self, sun_labels, sun_parents, sun_values):
-        
+        # Creates a sunburst chart with the provided labels, parents, and values.
+
         sun_fig = go.Figure(go.Sunburst(
             labels=sun_labels,
             parents=sun_parents,
@@ -75,9 +81,13 @@ class graphCreator:
         
 
         sun_chart_data = sun_fig.to_json()
+
+        # Returns the JSON data representation of the sunburst chart.
         return sun_chart_data
     
     def create_horizontal_bars(self, x, y, country_average):
+        # Creates a horizontal bar chart with the provided x and y values, representing CO2 emissions by country.
+
         horizontal_bar_fig = go.Figure()
 
         horizontal_bar_fig.add_trace(go.Bar(
@@ -124,4 +134,6 @@ class graphCreator:
         '''
 
         horizontal_bar_data = horizontal_bar_fig.to_json()
+
+        # Returns the JSON data representation of the horizontal bar chart.
         return horizontal_bar_data
